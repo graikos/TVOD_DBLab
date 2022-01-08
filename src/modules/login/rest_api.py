@@ -20,7 +20,8 @@ class Login(Resource):
             return make_response(jsonify({
                 "type": user_types[type(user)],
                 "first_name": user.first_name,
-                "last_name": user.last_name
+                "last_name": user.last_name,
+                "token": token
             }), 200)
             
         except ValueError:
