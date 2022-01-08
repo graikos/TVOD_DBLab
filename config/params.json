@@ -1,0 +1,8 @@
+{
+    "database": {
+        "host": "localhost",
+        "database_name": "tvondemand",
+        "user": "user",
+        "password": "pass123"
+    }
+}

@@ -126,11 +126,13 @@ CREATE TABLE customer (
   customer_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
   first_name VARCHAR(45) NOT NULL,
   last_name VARCHAR(45) NOT NULL,
-  email VARCHAR(50) DEFAULT NULL,
+  email VARCHAR(50) DEFAULT NULL UNIQUE,
   address_id SMALLINT UNSIGNED NOT NULL,
   active BOOLEAN NOT NULL DEFAULT TRUE,
   create_date DATETIME NOT NULL,
   subscription_type ENUM('FILMS', 'SHOWS', 'BOTH'),
+  pass_hash CHAR(64) NOT NULL,
+  pass_salt CHAR(8) NOT NULL,
   PRIMARY KEY  (customer_id),
   CONSTRAINT fk_customer_address FOREIGN KEY (address_id) REFERENCES address (address_id) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT fk_subscription_type FOREIGN KEY (subscription_type) REFERENCES subscription(subscription_type) ON DELETE RESTRICT ON UPDATE CASCADE
@@ -144,10 +146,12 @@ CREATE TABLE employee (
   employee_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
   first_name VARCHAR(45) NOT NULL,
   last_name VARCHAR(45) NOT NULL,
-  email VARCHAR(50) DEFAULT NULL,
+  email VARCHAR(50) DEFAULT NULL UNIQUE,
   address_id SMALLINT UNSIGNED NOT NULL,
   active BOOLEAN NOT NULL DEFAULT TRUE,
   create_date DATETIME NOT NULL,
+  pass_hash CHAR(64) NOT NULL,
+  pass_salt CHAR(8) NOT NULL,
   PRIMARY KEY  (employee_id),
   CONSTRAINT fk_employee_address FOREIGN KEY (address_id) REFERENCES address (address_id) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -156,15 +160,17 @@ CREATE TABLE employee (
 -- Table structure for table `administrator`
 --
 CREATE TABLE administrator (
-administrator_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
-first_name VARCHAR(45) NOT NULL,
-last_name VARCHAR(45) NOT NULL,
-email VARCHAR(50) DEFAULT NULL,
-address_id SMALLINT UNSIGNED NOT NULL,
-active BOOLEAN NOT NULL DEFAULT TRUE,
-create_date DATETIME NOT NULL,
-PRIMARY KEY  (administrator_id),
-CONSTRAINT fk_administrator_address FOREIGN KEY (address_id) REFERENCES address (address_id) ON DELETE RESTRICT ON UPDATE CASCADE
+  administrator_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  first_name VARCHAR(45) NOT NULL,
+  last_name VARCHAR(45) NOT NULL,
+  email VARCHAR(50) DEFAULT NULL UNIQUE,
+  address_id SMALLINT UNSIGNED NOT NULL,
+  active BOOLEAN NOT NULL DEFAULT TRUE,
+  create_date DATETIME NOT NULL,
+  pass_hash CHAR(64) NOT NULL,
+  pass_salt CHAR(8) NOT NULL,
+  PRIMARY KEY  (administrator_id),
+  CONSTRAINT fk_administrator_address FOREIGN KEY (address_id) REFERENCES address (address_id) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
