@@ -4,10 +4,19 @@ hostname = hostname.slice(0, hostname.length-1).join("/");
 
 const loginEndpoint = "/api/login"
 
+const enterPressOnInput = (e) => {
+    if (e.key === "Enter") {
+        submitLoginForm();
+    }
+}
+
 window.onload = () => {
     let loginbtn = document.getElementById("login-btn");
-    loginbtn.addEventListener('click', submitLoginForm);
-    console.log(hostname);
+    loginbtn.addEventListener("click", submitLoginForm);
+    let emailForm = document.getElementById("email-input");
+    let passwordForm = document.getElementById("password-input");
+    emailForm.addEventListener("keypress", enterPressOnInput);
+    passwordForm.addEventListener("keypress", enterPressOnInput);
 };
 
 
