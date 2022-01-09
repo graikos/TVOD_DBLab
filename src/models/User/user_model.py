@@ -16,12 +16,9 @@ class User(abc.ABC):
 
     def get_user_data_by_email(self, email):
         cur = dbconn.cursor()
-        print(self.TABLE)
         cur.execute(f"SELECT * FROM {self.TABLE} WHERE email = %s", params=(email,))
         res = cur.fetchone()
         cur.close()
-
-        print(f"Got {res}")
 
         if not res:
             raise ValueError("User with given email not found in database")
@@ -32,9 +29,13 @@ class User(abc.ABC):
         self.address_id = res[4]
         self.active = res[5]
         self.create_date = res[6]
-        self.sub_type = res[7]
 
-        return res[8], res[9]
+        pass_hash_index, pass_salt_index = 7, 8
+        if type(self) is Customer:
+            self.sub_type = res[7]
+            pass_hash_index, pass_salt_index = 8, 9
+
+        return res[pass_hash_index], res[pass_salt_index]
 
 
 class Customer(User):

@@ -13,7 +13,10 @@ def check_credentials(uname, pwd):
     user = None
     for user_type in user_types:
         user = user_type()
-        pass_data = user.get_user_data_by_email(uname)
+        try:
+            pass_data = user.get_user_data_by_email(uname)
+        except ValueError:
+            continue
         if pass_data:
             break
 
