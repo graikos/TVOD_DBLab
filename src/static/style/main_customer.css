@@ -1,0 +1,248 @@
+
+.navbar-settings {
+    color: rgb(78, 78, 78);
+    font-weight: 400;
+    float: right;
+    font-size: 20px;
+    padding-right: 40px;
+    padding-left: 20px;
+    text-decoration: none;
+    transition: all .25s;
+}
+.navbar-settings:hover {
+    color: white;
+}
+
+.main-container {
+    display: inline-block;
+    position: relative;
+    width:80%;
+    margin-left:10%;
+    margin-top:15vh;
+}
+
+.tab-bar {
+    position: relative;
+    display: inline-block;
+    width:100%;
+}
+
+.tab-btn {
+    display: inline-block;
+    position: relative;
+    text-decoration: none;
+    color: #494949;
+    font-family: "Inter";
+    font-weight: 700;
+    font-size: 25px;
+    line-height: 50px;
+    padding-left:25px;
+    padding-right:25px;
+    cursor: pointer;
+    transition: all .15s;
+}
+
+.tab-btn:hover {
+    color: #fff;
+}
+
+.tab-btn-active {
+    color: #fff;
+}
+
+.content-container {
+    margin-top: 3vh;
+    display: inline-block;
+    position: relative;
+    width: 100%;
+}
+
+.content-card {
+    left : -15px;
+    display: inline-block;
+    position: relative;
+    width: 28%;
+    overflow-y: hidden;
+    margin-right:2.5%;
+    margin-left:2.5%;
+    margin-bottom: 20px;
+    min-width: 400px;
+    height: 25vh;
+    min-height: 250px;
+    background-image: url("../img/pop_stock.png");
+    background-blend-mode: luminosity;
+    background-size: cover;
+    background-position: center;
+    animation: cardenter .25s;
+}
+
+
+.content-card::before {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1C1C1C;
+    opacity: 0.85;
+    transition: all .25s;
+}
+
+.card-text-wrapper {
+    position: absolute;
+    top: 16vh;
+    display: inline-block;
+    width: 95%;
+    left:2.5%;
+    transition: all .25s;
+}
+
+.card-details-wrapper {
+    display: block;
+    position: absolute;
+    width: 95%;
+    left:2.5%;
+    bottom: -55%;
+    opacity: 0;
+    transition: all .25s;
+}
+
+.content-card:hover::before {
+    opacity: .92;
+}
+
+
+
+.content-card:hover > .card-text-wrapper {
+    top: 2vh;
+}
+
+.content-card:hover > .card-details-wrapper {
+    opacity: 1;
+    bottom: 2vh;
+}
+
+.content-card:hover > .card-text-wrapper .card-seasons {
+    opacity: 0.5;
+}
+
+.content-card:hover .card-text-wrapper .card-release-year {
+    visibility: visible;
+    opacity: 0.5;
+}
+
+.content-card:hover > .card-text-wrapper .card-tag-wrapper .card-tags {
+    top: -2vh;
+}
+
+.card-description {
+    margin:0;
+    padding:0;
+    color: white;
+    font-family: "Inter";
+    font-weight: 400;
+    font-size: 16px;
+    margin-bottom: 30px;
+}
+
+
+.card-title-wrapper {
+    display:inline-block;
+}
+.card-title {
+    position: relative;
+    font-size: 20px;
+    font-family: "Inter";
+    font-weight: 700;
+    color: white;
+}
+
+.card-seasons {
+    position: relative;
+    font-family: "Inter";
+    font-weight: 300;
+    font-size: "20";
+    color: white;
+    opacity: 0;
+    display: inline-block;
+    transition: all .25s;
+}
+
+.card-release-year {
+    position: relative;
+    font-family: "Inter";
+    font-weight: 300;
+    font-size: "20";
+    color: white;
+    opacity: 0;
+    visibility: hidden;
+    transition: all .25s;
+}
+
+.card-tag-wrapper {
+    position: relative;
+    margin-top: 5px;
+    display: inline-block;
+    width: 100%;
+}
+
+.card-tags {
+    display: inline-block;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    position: absolute;
+    top:-3.5vh;
+    width: 100%;
+    height: 34px;
+    transition: all .25s;
+}
+.card-tag {
+    display: inline-block;
+    position: relative;
+    color: white;
+    background-color: #AD1457;
+    font-family: "Inter";
+    font-size: 14px;
+    font-weight: 400;
+    line-height:18px;
+    padding-left:10px;
+    padding-right:10px;
+    padding-top:4px;
+    padding-bottom:4px;
+    border-radius: 3px;
+    margin-top: 8px;
+    margin-left: 7px;
+}
+
+.card-tag-rating {
+    color: black;
+    background-color: white;
+}
+
+.card-cta-btn {
+    position:relative;
+    display: inline-block;
+    font-family: "Inter";
+    font-weight: 400;
+    font-size: 14px;
+    text-decoration: none;
+    color: white;
+    width: 100px;
+    line-height: 35px;
+    border-radius: 3px;
+    background-color: #AD1457;
+    text-align: center;
+    cursor: pointer;
+    left: calc(50% - 50px);
+    outline:none;
+    border:none;
+    transition: all .25s;
+}
+.card-cta-btn:hover {
+    background-color: #ce2d73;
+}
+.card-cta-btn:active {
+    background-color: #72163e;
+}

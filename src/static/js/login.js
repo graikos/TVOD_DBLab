@@ -38,6 +38,7 @@ const submitLoginForm = (e) => {
                 document.cookie = "first_name="+resp.first_name+"; SameSite=Lax";
                 document.cookie = "last_name="+resp.last_name+"; SameSite=Lax";
                 document.cookie = "type="+resp.type+"; SameSite=Lax";
+                document.cookie = "sub_type="+resp.sub_type+"; SameSite=Lax";
                 window.location.href="/main";
             } else {
                 makeToast("failure", "Incorrect credentials", 1500);

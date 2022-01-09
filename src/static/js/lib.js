@@ -32,3 +32,13 @@ const makeToast = (type, msg, duration) => {
         }, 500);
     }, duration);
 };
+
+const enableLoader = () => {
+    let loader = document.getElementById("main-loader");
+    loader.classList.add("loader-visible");
+}
+
+const disableLoader = () => {
+    let loader = document.getElementById("main-loader");
+    loader.classList.remove("loader-visible");
+}

@@ -232,17 +232,11 @@ CREATE TABLE tv_show (
 
 CREATE TABLE season (
   season_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  show_id INT UNSIGNED NOT NULL,
   release_year YEAR DEFAULT NULL,
   episodes INT UNSIGNED NOT NULL,
-  PRIMARY KEY (season_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE tv_show_season (
-  show_id INT UNSIGNED NOT NULL,
-  season_id INT UNSIGNED NOT NULL,
-  PRIMARY KEY (show_id, season_id),
-  CONSTRAINT fk_show_id FOREIGN KEY (show_id) REFERENCES tv_show (show_id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT fk_season_id FOREIGN KEY (season_id) REFERENCES season (season_id) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (season_id),
+  CONSTRAINT fk_show_id FOREIGN KEY (show_id) REFERENCES tv_show (show_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE tv_show_actor (

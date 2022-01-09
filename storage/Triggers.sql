@@ -39,8 +39,8 @@ BEGIN
         IF NEW.season_id is NULL OR NEW.episode_number is NULL OR
             (SELECT episodes FROM season WHERE season_id=NEW.season_id) < NEW.episode_number OR NEW.episode_number = 0 OR
             (SELECT inventory.show_id
-            FROM inventory INNER JOIN tv_show_season ON tv_show_season.show_id=inventory.show_id
-            WHERE tv_show_season.season_id = NEW.season_id AND inventory.inventory_id = NEW.inventory_id) IS NULL
+            FROM inventory INNER JOIN season ON season.show_id=inventory.show_id
+            WHERE season.season_id = NEW.season_id AND inventory.inventory_id = NEW.inventory_id) IS NULL
         THEN
             SET NEW.rental_date = NULL;
         END IF;

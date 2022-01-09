@@ -12,7 +12,6 @@ user_type_to_page = {
         Employee: "main_employee.html", 
         Administrator: "main_administrator.html"
     }
-
 }
 
 @app.route("/")
@@ -31,7 +30,7 @@ def main():
         resp.delete_cookie('sessid')
         return resp
 
-    return render_template(user_type_to_page["main"][type(user)])
+    return render_template(user_type_to_page["main"][type(user)], sub_type=request.cookies["sub_type"])
 
 @app.route("/login")
 def login():
