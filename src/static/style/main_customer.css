@@ -91,7 +91,7 @@
 }
 
 .card-text-wrapper {
-    position: absolute;
+    position: relative;
     top: 16vh;
     display: inline-block;
     width: 95%;
@@ -101,9 +101,8 @@
 
 .card-details-wrapper {
     display: block;
-    position: absolute;
+    position: relative;
     width: 95%;
-    left:2.5%;
     bottom: -55%;
     opacity: 0;
     transition: all .25s;
@@ -119,9 +118,9 @@
     top: 2vh;
 }
 
-.content-card:hover > .card-details-wrapper {
+.content-card:hover > .card-text-wrapper .card-details-wrapper {
     opacity: 1;
-    bottom: 2vh;
+    top: 2vh;
 }
 
 .content-card:hover > .card-text-wrapper .card-seasons {
@@ -145,6 +144,11 @@
     font-weight: 400;
     font-size: 16px;
     margin-bottom: 30px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
 }
 
 
@@ -239,6 +243,7 @@
     outline:none;
     border:none;
     transition: all .25s;
+    bottom: 2vh;
 }
 .card-cta-btn:hover {
     background-color: #ce2d73;

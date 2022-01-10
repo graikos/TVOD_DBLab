@@ -142,10 +142,10 @@ const addFilmCard = (filmdata) => {
     temphtml += `
                     </div>
                 </div>
-            </div>
-            <div class="card-details-wrapper">
-                <p class="card-description">${filmdata.description}</p>
-                <a class="card-cta-btn" data-entry-id=${filmdata.film_id}>Rent</a>
+                <div class="card-details-wrapper">
+                    <p class="card-description">${filmdata.description}</p>
+                    <a class="card-cta-btn" data-entry-id=${filmdata.film_id}>Rent</a>
+                </div>
             </div>
         </div>
     `;   
@@ -174,10 +174,10 @@ const addShowCard = (showdata) => {
     temphtml += `
                     </div>
                 </div>
-            </div>
-            <div class="card-details-wrapper">
-                <p class="card-description">${showdata.description}</p>
-                <a class="card-cta-btn" data-entry-id=${showdata.show_id}>Rent</a>
+                <div class="card-details-wrapper">
+                    <p class="card-description">${showdata.description}</p>
+                    <a class="card-cta-btn" data-entry-id=${showdata.show_id}>Rent</a>
+                </div>
             </div>
         </div>
     `;   
