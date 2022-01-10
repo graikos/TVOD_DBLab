@@ -1,5 +1,74 @@
 let activeToast = undefined;
 
+class Selector {
+    constructor(element, options, selected, onSelectedAction) {
+        this.element = element;
+        this.options = [];
+        this.onSelectedAction = onSelectedAction;
+        
+        let currentOption = 0;
+        for (let option in options) {
+            this.addOption(option, selected == currentOption);
+            ++currentOption;
+        }
+    }
+
+    addOption(text, select) {
+        console.log(`adding ${text}`)
+        let optionspan = document.createElement("span");
+        let textspan = document.createElement("span");
+        textspan.innerHTML = text;
+        optionspan.classList.add("select-option")
+        optionspan.setAttribute("data-option-index", this.options.length);
+        let currentidx = this.options.length;
+        optionspan.addEventListener("click", (e) => {
+            this.selectOption(currentidx);
+        });
+        optionspan.appendChild(textspan);
+        let wrapper = this.element.getElementsByClassName("select-option-wrapper")[0];
+        wrapper.appendChild(optionspan);
+
+        this.options.push(text);
+        if (select) {
+            this.selected = this.options.length - 1;
+            this.selectOption(this.selected);
+        }
+    }
+
+    selectOption(optionidx) {
+        if (this.selected == optionidx) {
+            return;
+        }
+        let selectedText = this.element.getElementsByClassName("selected-option-text")[0];
+
+        let htmloptions = this.element.getElementsByClassName("select-option-wrapper")[0].children;
+        if (this.selected >= 0) {
+            htmloptions[this.selected].classList.remove("active-option");
+        }
+        htmloptions[optionidx].classList.add("active-option");
+
+        selectedText.innerHTML = `<span>${this.options[optionidx]}</span>`;
+        this.element.setAttribute("data-selected", optionidx);
+
+        this.selected = optionidx;
+
+        if (this.onSelectedAction === undefined) {
+            return;
+        }
+        this.onSelectedAction(this.options[optionidx]);
+    }
+
+    clear() {
+        this.options = [];
+        this.selected = -1;
+        this.element.setAttribute("data-selected", "");
+        this.element.getElementsByClassName("selected-option-text")[0].innerHTML = `<span>&nbsp;</span>`;
+        this.element.getElementsByClassName("select-option-wrapper")[0].innerHTML = ``;
+    }
+    
+}
+
+
 const makeToast = (type, msg, duration) => {
     let body = document.getElementsByTagName("body")[0];
     let toast = document.createElement("div");
@@ -41,4 +110,26 @@ const enableLoader = () => {
 const disableLoader = () => {
     let loader = document.getElementById("main-loader");
     loader.classList.remove("loader-visible");
+}
+
+const selectClick = (e) =>  {
+    let menu = e.getElementsByClassName("select-option-wrapper")[0];
+    menu.classList.toggle("invisible-select-menu");
+};
+
+
+const getCookie = (cname) => {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
 }

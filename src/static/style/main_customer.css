@@ -21,34 +21,7 @@
     margin-top:15vh;
 }
 
-.tab-bar {
-    position: relative;
-    display: inline-block;
-    width:100%;
-}
 
-.tab-btn {
-    display: inline-block;
-    position: relative;
-    text-decoration: none;
-    color: #494949;
-    font-family: "Inter";
-    font-weight: 700;
-    font-size: 25px;
-    line-height: 50px;
-    padding-left:25px;
-    padding-right:25px;
-    cursor: pointer;
-    transition: all .15s;
-}
-
-.tab-btn:hover {
-    color: #fff;
-}
-
-.tab-btn-active {
-    color: #fff;
-}
 
 .content-container {
     margin-top: 3vh;
@@ -103,7 +76,7 @@
     display: block;
     position: relative;
     width: 95%;
-    bottom: -55%;
+    top: 2vh;
     opacity: 0;
     transition: all .25s;
 }

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>TVOnDemand</title>
+        <link rel="stylesheet" href="../static/style/style.css">
+        <link rel="stylesheet" href="../static/style/customer_settings.css">
+        <script src="../static/js/lib.js" type="text/javascript"></script>
+        <script src="../static/js/customer_settings.js" type="text/javascript"></script>
+    </head>
+    <body>
+        <div class="navbar">
+            <a href="/main" class="navbar-title">TVOnDemand</a>
+        </div>
+        <div class="side-navbar">
+            <a class="tab-btn tab-btn-active">Profile Settings</a>
+            <a class="tab-btn">My Rentals</a>
+        </div>
+        <div class="main-content">
+            <div class="profile-form">
+                <div class="input-field-wrap half-input">
+                    <h4 class="input-label">First name</h4>
+                    <input type="text" class="form-input" id="first-name-input">
+                </div>
+                <div class="input-field-wrap half-input">
+                    <h4 class="input-label">Last name</h4>
+                    <input type="text" class="form-input" id="last-name-input">
+                </div><br>
+                <div class="input-field-wrap">
+                    <h4 class="input-label">E-mail</h4>
+                    <input type="text" class="form-input" disabled value="h@mdfaskfj.com" id="email-input">
+                </div>
+                <div class="input-field-wrap half-input">
+                    <h4 class="input-label">Country</h4>
+                    <div class="select" data-selected="0" onclick="selectClick(this)" id="country-select">
+                        <span class="selected-option-text select-option"><span>Default</span></span>
+                        <div class="select-option-wrapper invisible-select-menu">
+                        </div>
+                    </div>
+                </div>
+                <div class="input-field-wrap half-input">
+                    <h4 class="input-label">City</h4>
+                    <div class="select" data-selected="0" onclick="selectClick(this)" id="city-select">
+                        <span class="selected-option-text select-option"><span>Default</span></span>
+                        <div class="select-option-wrapper invisible-select-menu">
+                        </div>
+                    </div>
+                </div>
+                <div class="input-field-wrap half-input">
+                    <h4 class="input-label">Address</h4>
+                    <div class="select" data-selected="0" onclick="selectClick(this)" id="address-select">
+                        <span class="selected-option-text select-option"><span>Default</span></span>
+                        <div class="select-option-wrapper invisible-select-menu">
+                        </div>
+                    </div>
+                </div>
+                <div class="input-field-wrap half-input">
+                    <h4 class="input-label">District</h4>
+                    <div class="select" data-selected="0" onclick="selectClick(this)" id="district-select">
+                        <span class="selected-option-text select-option"><span>Default</span></span>
+                        <div class="select-option-wrapper invisible-select-menu">
+                        </div>
+                    </div>
+                </div>
+                <div class="input-field-wrap">
+                    <h4 class="input-label">Subscription Type</h4>
+                    <div class="select" data-selected="0" onclick="selectClick(this)" id="sub-type-select">
+                        <span class="selected-option-text select-option"><span>Default</span></span>
+                        <div class="select-option-wrapper invisible-select-menu">
+                        </div>
+                    </div>
+                </div>
+                <button class="form-submit">Update</button>
+            </div>
+        </div>
+        <span class="loader" id="main-loader"></span>
+    </body>
+</html>

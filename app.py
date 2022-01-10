@@ -11,7 +11,7 @@ user_type_to_page = {
         Customer: "main_customer.html", 
         Employee: "main_employee.html", 
         Administrator: "main_administrator.html"
-    }
+    },
 }
 
 @app.route("/")
@@ -27,10 +27,27 @@ def main():
 
     except KeyError:
         resp = redirect("/login")
-        resp.delete_cookie('sessid')
+        resp.delete_cookie("sessid")
         return resp
 
     return render_template(user_type_to_page["main"][type(user)], sub_type=request.cookies["sub_type"])
+
+@app.route("/myaccount")
+def my_account():
+    token = request.cookies["sessid"]
+
+    try:
+        user = tokens[token]
+        if not isinstance(user, Customer):
+            raise ValueError
+
+    except (KeyError, ValueError):
+        resp = redirect("/login")
+        resp.delete_cookie("sessid")
+        return resp
+
+    
+    return render_template("customer_settings.html")
 
 @app.route("/login")
 def login():

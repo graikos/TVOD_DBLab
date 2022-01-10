@@ -102,6 +102,7 @@ body {
     font-weight: 700;
     font-size: 25px;
     line-height: 90px;
+    text-decoration: none;
     padding-left: 25px;
     padding-right: 25px;
     color: #AD1457;
@@ -229,4 +230,103 @@ body {
     100% {
         right:20px;
     }
+}
+
+.tab-bar {
+    position: relative;
+    display: inline-block;
+    width:100%;
+}
+
+.tab-btn {
+    display: inline-block;
+    position: relative;
+    text-decoration: none;
+    color: #494949;
+    font-family: "Inter";
+    font-weight: 700;
+    font-size: 25px;
+    line-height: 50px;
+    padding-left:25px;
+    padding-right:25px;
+    cursor: pointer;
+    transition: all .15s;
+}
+
+.tab-btn:hover {
+    color: #fff;
+}
+
+.tab-btn-active {
+    color: #fff;
+}
+
+.side-navbar {
+    position: fixed;
+    width: 20%;
+    left:0;
+    top:0;
+    height: 100%;
+}
+
+.side-navbar .tab-btn {
+    width:80%;
+    top:12vh;
+    left:10%;
+}
+
+.select {
+    display: block;
+    font-size: 14px;
+    margin: 0;
+    font-family: "Inter";
+    font-weight: 400;
+    width: 200px;
+    border-radius: 2px;
+    overflow-y: hidden;
+}
+
+.select-option-wrapper {
+    margin-top: 0;
+    position: absolute;
+    z-index: +2;
+    width:200px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.invisible-select-menu {
+    display: none;
+}
+
+.select-option {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    line-height: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #1c1c1c;
+    margin:0;
+    cursor: default;
+    color: white;
+    transition: all .15s;
+}
+
+.select-option span {
+    position: relative;
+    left: 5px;
+}
+
+.select-option:hover {
+    background-color:rgb(44, 44, 44);
+}
+
+.selected-option-text {
+    background-color:#1c1c1c;
+    color: white;
+}
+
+.active-option {
+    background-color: rgb(44, 44, 44);
 }
