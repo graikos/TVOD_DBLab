@@ -234,6 +234,7 @@ CREATE TABLE season (
   season_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   show_id INT UNSIGNED NOT NULL,
   release_year YEAR DEFAULT NULL,
+  season_number INT UNSIGNED NOT NULL,
   episodes INT UNSIGNED NOT NULL,
   PRIMARY KEY (season_id),
   CONSTRAINT fk_show_id FOREIGN KEY (show_id) REFERENCES tv_show (show_id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -283,7 +284,6 @@ CREATE TABLE rental (
   episode_number INT UNSIGNED DEFAULT NULL,
   customer_id SMALLINT UNSIGNED NOT NULL,
   PRIMARY KEY (rental_id),
-  UNIQUE KEY  (rental_date, inventory_id, customer_id, season_id, episode_number),
   CONSTRAINT fk_rental_inventory FOREIGN KEY (inventory_id) REFERENCES inventory (inventory_id) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT fk_rental_customer FOREIGN KEY (customer_id) REFERENCES customer (customer_id) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT fk_rental_season_id FOREIGN KEY (season_id) REFERENCES season(season_id) ON DELETE RESTRICT ON UPDATE CASCADE

@@ -20,9 +20,8 @@ def index():
 
 @app.route("/main")
 def main():
-    token = request.cookies["sessid"]
-
     try:
+        token = request.cookies["sessid"]
         user = tokens[token]
 
     except KeyError:
@@ -34,9 +33,8 @@ def main():
 
 @app.route("/myaccount")
 def my_account():
-    token = request.cookies["sessid"]
-
     try:
+        token = request.cookies["sessid"]
         user = tokens[token]
         if not isinstance(user, Customer):
             raise ValueError

@@ -109,3 +109,8 @@
 .form-submit:hover {
     background-color: #ce2d73;
 }
+
+#country-select {
+    display: inline-block;
+    vertical-align: middle;
+}

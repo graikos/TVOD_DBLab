@@ -224,3 +224,139 @@
 .card-cta-btn:active {
     background-color: #72163e;
 }
+
+.rent-dialog {
+    display: none;
+    position: fixed;
+    width: 50%;
+    left: 25%;
+    bottom: 50px;
+    opacity: 0;
+    background-color: #161616;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    border-radius: 5px;
+    z-index: +999;
+    box-shadow:0px 0px 11px 0px rgba(0,0,0,0.43);
+}
+
+.item-details-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 40%;
+    margin-left: 2%;
+    vertical-align: middle;
+}
+
+.item-details {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-family: "Inter";
+    font-weight: 400;
+    color: white;
+    font-size: 16px;
+}
+
+.item-details span {
+    font-weight: 300;
+    color: #5e5e5e;
+}
+
+.close-dialog {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: inline-block;
+    width: 45px;
+    cursor: pointer;
+    transition: all .15s;
+}
+
+.close-dialog:hover span {
+    color: white;
+}
+
+.close-dialog span {
+    line-height: 45px;
+    width: 100%;
+    text-align: center;
+    color: #494949;
+    transition: all .15s;
+}
+
+.picker-wrapper {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 3%;
+    width: 20%;
+}
+
+.picker-title {
+    padding-top: 7px;
+    position: relative;
+    display: inline-block;
+    font-family: "Inter";
+    font-weight: 300;
+    color: #5e5e5e;
+    padding-bottom: 4px;
+}
+
+.picker-wrapper .select {
+    margin-top: 3px;
+    display: inline-block;
+    width: 100%;
+}
+
+.select-option-wrapper {
+    max-height: 120px;
+    width: 100%;
+}
+
+.rent-now-wrapper {
+    display: inline-block;
+    position: relative;
+    width: 30%;
+    top: 0;
+}
+
+.rent-now-wrapper .card-cta-btn {
+    margin-top: 0;
+    bottom: 0;
+}
+
+.hidden-details {
+    display: none !important;
+}
+
+.rent-dialog-film {
+    width: 30%;
+    left: 35%;
+}
+
+.rent-dialog-film .item-details-wrapper {
+    width: 70%;
+}
+
+.rent-dialog-film .rent-now-wrapper {
+    width: 20%;
+}
+
+.active-rent-dialog {
+    display: inline-block;
+    animation: dialogenter .25s;
+    animation-fill-mode: forwards;
+    opacity: 1;
+}
+
+
+@keyframes dialogenter {
+    from {
+        bottom: 20px;
+    } to {
+        bottom: 50px;
+    }
+}

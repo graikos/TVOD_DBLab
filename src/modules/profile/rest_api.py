@@ -27,9 +27,11 @@ class Profile(Resource):
             "city": requested_data[5],
             "address": requested_data[6],
             "district": requested_data[7],
-            "active": requested_data[8],
-            "create_date": requested_data[9],
-            "sub_type": requested_data[10]
+            "postal_code": requested_data[8],
+            "phone": requested_data[9],
+            "active": requested_data[10],
+            "create_date": requested_data[11],
+            "sub_type": requested_data[12]
         }), 200)
 
     def put(self):
@@ -50,13 +52,10 @@ class Profile(Resource):
         except (KeyError, ValueError):
             return make_response(jsonify(""), 403)
 
-        address_id = Address.get_id_by_address(data["country"], data["city"],
-        data["address"], data["district"])[0][0]
+        address_id = Address.add_address(data["country"], data["city"], data["address"], data["district"], data["postal_code"], data["phone"])
 
         new_customer.update_data(data["first_name"], data["last_name"],
         address_id, data["sub_type"].upper())
-
-        print(new_customer.sub_type)
 
         return make_response(jsonify(""), 200)
 

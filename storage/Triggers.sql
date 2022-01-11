@@ -6,11 +6,11 @@ CREATE TRIGGER sale
 BEFORE INSERT ON payment
 FOR EACH ROW
 BEGIN
-    DECLARE email VARCHAR(50);
+    DECLARE user_email VARCHAR(50);
     DECLARE total_rentals INT;
-    SET email = (SELECT email FROM customer WHERE customer_id=NEW.customer_id);
-    CALL rentals_on_date(email, NOW(), total_rentals);
-    IF total_rentals % 3 = 0 THEN
+    SELECT email INTO user_email FROM customer WHERE customer_id=NEW.customer_id;
+    CALL rentals_on_date(user_email, NOW(), total_rentals);
+    IF MOD(total_rentals, 3) = 0 AND total_rentals > 0 THEN
         SET NEW.amount = 0.5*NEW.amount;
     END IF;
 END$

@@ -12,8 +12,9 @@
             <a href="/main" class="navbar-title">TVOnDemand</a>
         </div>
         <div class="side-navbar">
-            <a class="tab-btn tab-btn-active">Profile Settings</a>
-            <a class="tab-btn">My Rentals</a>
+            <a class="tab-btn tab-btn-active" id="profile-settings-tab">Profile Settings</a>
+            <a class="tab-btn" id="my-rentals-tab">My Rentals</a>
+            <a class="tab-btn" id="log-out">Log out</a>
         </div>
         <div class="main-content">
             <div class="profile-form">
@@ -24,10 +25,26 @@
                 <div class="input-field-wrap half-input">
                     <h4 class="input-label">Last name</h4>
                     <input type="text" class="form-input" id="last-name-input">
-                </div><br>
+                </div>
                 <div class="input-field-wrap">
                     <h4 class="input-label">E-mail</h4>
-                    <input type="text" class="form-input" disabled value="h@mdfaskfj.com" id="email-input">
+                    <input type="text" class="form-input" disabled value="" id="email-input">
+                </div>
+                <div class="input-field-wrap">
+                    <h4 class="input-label">Address</h4>
+                    <input type="text" class="form-input" id="address-input">
+                </div>
+                <div class="input-field-wrap half-input">
+                    <h4 class="input-label">District</h4>
+                    <input type="text" class="form-input" id="district-input">
+                </div>
+                <div class="input-field-wrap half-input">
+                    <h4 class="input-label">Phone</h4>
+                    <input type="text" class="form-input" id="phone-input">
+                </div>
+                <div class="input-field-wrap half-input">
+                    <h4 class="input-label">Postal Code</h4>
+                    <input type="text" class="form-input" id="postal-code-input">
                 </div>
                 <div class="input-field-wrap half-input">
                     <h4 class="input-label">Country</h4>
@@ -46,22 +63,6 @@
                     </div>
                 </div>
                 <div class="input-field-wrap half-input">
-                    <h4 class="input-label">Address</h4>
-                    <div class="select" data-selected="0" onclick="selectClick(this)" id="address-select">
-                        <span class="selected-option-text select-option"><span>Default</span></span>
-                        <div class="select-option-wrapper invisible-select-menu">
-                        </div>
-                    </div>
-                </div>
-                <div class="input-field-wrap half-input">
-                    <h4 class="input-label">District</h4>
-                    <div class="select" data-selected="0" onclick="selectClick(this)" id="district-select">
-                        <span class="selected-option-text select-option"><span>Default</span></span>
-                        <div class="select-option-wrapper invisible-select-menu">
-                        </div>
-                    </div>
-                </div>
-                <div class="input-field-wrap">
                     <h4 class="input-label">Subscription Type</h4>
                     <div class="select" data-selected="0" onclick="selectClick(this)" id="sub-type-select">
                         <span class="selected-option-text select-option"><span>Default</span></span>

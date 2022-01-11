@@ -1,16 +1,21 @@
 let activeToast = undefined;
 
 class Selector {
-    constructor(element, options, selected, onSelectedAction) {
+    constructor(element, options, selected, onSelectedAction, defaultText) {
         this.element = element;
         this.options = [];
         this.onSelectedAction = onSelectedAction;
+        this.defaultText = defaultText;
         
         let currentOption = 0;
         for (let option in options) {
             this.addOption(option, selected == currentOption);
             ++currentOption;
         }
+    }
+
+    setText(text) {
+        this.element.getElementsByClassName("selected-option-text")[0].innerHTML = `<span>${text}</span>`;
     }
 
     addOption(text, select) {
@@ -61,7 +66,11 @@ class Selector {
         this.options = [];
         this.selected = -1;
         this.element.setAttribute("data-selected", "");
-        this.element.getElementsByClassName("selected-option-text")[0].innerHTML = `<span>&nbsp;</span>`;
+        if (this.defaultText !== undefined) {
+            this.setText(this.defaultText);
+        } else {
+            this.element.getElementsByClassName("selected-option-text")[0].innerHTML = `<span>&nbsp;</span>`;
+        }
         this.element.getElementsByClassName("select-option-wrapper")[0].innerHTML = ``;
     }
 
@@ -135,4 +144,15 @@ const getCookie = (cname) => {
     }
   }
   return "";
+}
+
+const deleteAllCookies = () => {
+    var cookies = document.cookie.split(";");
+
+    for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i];
+        var eqPos = cookie.indexOf("=");
+        var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    }
 }

@@ -1,19 +1,16 @@
 from flask_restful import Resource
 from flask import request, jsonify, make_response
-from . import lib
 from storage import tokens
 from src.models.Film import Film
 from src.models.Show import Show
 
-METHODS = {"FILMS": Film.get_films, "SHOWS": Show.get_shows}
+METHODS = {"FILMS": Film.get_available_films, "SHOWS": Show.get_available_shows}
 
 class Fetch(Resource):
     def get(self):
         try:
             user = tokens[request.headers["authorization"]]
             fetch_type = request.args.get("type")
-            print("fetch type", fetch_type)
-            print("user sub type", user.sub_type)
             if user.sub_type != "BOTH" and fetch_type != user.sub_type or fetch_type not in METHODS:
                 raise ValueError
 

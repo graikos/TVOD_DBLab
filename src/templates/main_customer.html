@@ -27,6 +27,35 @@
             </div>
             <div class="content-container" id="content-container"></div>
         </div>
+        <div class="rent-dialog" id="rent-dialog">
+            <span class="close-dialog" onclick="closeRentDialog()"><span class="material-icons">close</span></span>
+            <div class="item-details-wrapper">
+                <span class="item-details" id="title-details"><span>Title: </span>Twin Peaks</span>
+                <span class="item-details" id="description-details"><span>Description: </span>Actor Ena, Actor Dyo</span>
+                <span class="item-details" id="cast-details"><span>Cast: </span>Actor Ena, Actor Dyo</span>
+                <span class="item-details" id="release-year-details"><span>Release Year: </span>2018</span>
+                <span class="item-details" id="rating-details"><span>Rating: </span>PG-13</span>
+                <span class="item-details" id="categories-details"><span>Categories: </span>Drama, Mystery</span>
+                <span class="item-details" id="duration-details"><span>Duration: </span>180min</span>
+            </div>
+            <div class="picker-wrapper" id="picker-wrapper">
+                <span class="picker-title">Season:</span>
+                <div class="select" data-selected="0" onclick="selectClick(this)" id="season-select">
+                    <span class="selected-option-text select-option"><span>Default</span></span>
+                    <div class="select-option-wrapper invisible-select-menu">
+                    </div>
+                </div>
+                <span class="picker-title">Episode:</span>
+                <div class="select" data-selected="0" onclick="selectClick(this)" id="episode-select">
+                    <span class="selected-option-text select-option"><span>Default</span></span>
+                    <div class="select-option-wrapper invisible-select-menu">
+                    </div>
+                </div>
+            </div>
+            <div class="rent-now-wrapper">
+                <a class="card-cta-btn" id="rent-now-btn" onclick="rent(this)">Rent Now</a>
+            </div>
+        </div>
         <span class="loader" id="main-loader"></span>
     </body>
 </html>

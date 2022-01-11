@@ -4,7 +4,7 @@ const profileEndpoint = "/api/profile"
 const addressEndpoint = "/api/address"
 const subscriptionEndpoint = "/api/subscription"
 
-let dropdown_IDS = ["country-select", "city-select", "address-select", "district-select", "sub-type-select"];
+let dropdown_IDS = ["country-select", "city-select", "sub-type-select"];
 let profileData = {};
 let globalAddressData = {};
 let selectors = {}
@@ -13,6 +13,11 @@ window.onload = () => {
     dropdown_IDS.forEach((selector_id) => {
         let selector = document.getElementById(selector_id);
         selectors[selector_id] = new Selector(selector, [], -1, clears[selector_id]);
+    });
+
+    document.getElementById("log-out").addEventListener('click', () => {
+        deleteAllCookies();
+        window.location.href="/login";
     });
 
     let selector = document.getElementById("sub-type-select");
@@ -28,8 +33,10 @@ window.onload = () => {
         });
     });
 
+
     fetchUserData();
 };
+
 
 const fetchUserData = () => {
     let token = getCookie("sessid");
@@ -107,24 +114,27 @@ const fetchSubData = () => {
 };;
 
 const insertProfileData = (profdata) => {
+    console.log(profdata);
     let first_name_field = document.getElementById("first-name-input");
     let last_name_field = document.getElementById("last-name-input");
     let email_field = document.getElementById("email-input");
-    let country_sel = document.getElementById("country-select");
-    let city_sel = document.getElementById("city-select");
-    let address_sel = document.getElementById("address-select");
-    let district_sel = document.getElementById("district-select");
-    let sub_type_sel = document.getElementById("sub-type-select");
+    let address_field = document.getElementById("address-input");
+    let district_field = document.getElementById("district-input");
+    let phone_field = document.getElementById("phone-input");
+    let postal_code_field = document.getElementById("postal-code-input");
 
     first_name_field.value = profdata.first_name;
     last_name_field.value = profdata.last_name;
     email_field.value = profdata.email;
+    address_field.value = profdata.address;
+    district_field.value = profdata.district;
+    phone_field.value = profdata.phone;
+    postal_code_field.value = profdata.postal_code;
 
-    country_sel.getElementsByClassName("selected-option-text")[0].innerHTML = `<span>${profdata.country}</span>`;
-    city_sel.getElementsByClassName("selected-option-text")[0].innerHTML = `<span>${profdata.city}</span>`;
-    address_sel.getElementsByClassName("selected-option-text")[0].innerHTML = `<span>${profdata.address}</span>`;
-    district_sel.getElementsByClassName("selected-option-text")[0].innerHTML = `<span>${profdata.district}</span>`;
-    sub_type_sel.getElementsByClassName("selected-option-text")[0].innerHTML = `<span>${profdata.sub_type.charAt(0) + profdata.sub_type.slice(1).toLowerCase()}</span>`;
+
+    selectors["country-select"].setText(profdata.country);
+    selectors["city-select"].setText(profdata.city);
+    selectors["sub-type-select"].setText(profdata.sub_type.charAt(0) + profdata.sub_type.slice(1).toLowerCase());
 
     document.getElementsByClassName("profile-form")[0].classList.add("profile-form-visible");
 };
@@ -140,15 +150,6 @@ const initializeAddressData = (addrData) => {
             if (profileData.city != city) {
                 continue;
             }
-            for (let address in addrData[country][city]) {
-                selectors["address-select"].addOption(address, address==profileData.address);
-                if (profileData.address != address) {
-                    continue;
-                }
-                addrData[country][city][address].forEach( district => {
-                    selectors["district-select"].addOption(district, district==profileData.district);
-                });
-            }
         }
     }
     
@@ -161,56 +162,36 @@ const clearSelectors = (to_clear) => {
 };
 
 const pickCountry = (new_selected_country) => {
-    clearSelectors(["city-select", "address-select", "district-select"]);
+    clearSelectors(["city-select"]);
     for (let city in globalAddressData[new_selected_country]) {
         selectors["city-select"].addOption(city, city==profileData.city);
         if (profileData.city != city) {
             continue;
         }
-        for (let address in globalAddressData[country][city]) {
-            selectors["address-select"].addOption(address, address==profileData.address);
-            if (profileData.address != address) {
-                continue;
-            }
-            globalAddressData[country][city][address].forEach( district => {
-                selectors["district-select"].addOption(district, district==profileData.district);
-            });
-        }
     }
 
 };
 
-const pickCity = (new_selected_city) => {
-    clearSelectors(["address-select", "district-select"]);
-    for (let address in globalAddressData[selectors["country-select"].getSelected()][new_selected_city]) {
-        selectors["address-select"].addOption(address, address==profileData.address);
-        if (profileData.address != address) {
-            continue;
-        }
-        globalAddressData[country][city][address].forEach( district => {
-            selectors["district-select"].addOption(district, district==profileData.district);
-        });
-    }
 
-};
-
-const pickAddress = (new_selected_address) => {
-    globalAddressData[selectors["country-select"].getSelected()][selectors["city-select"].getSelected()][new_selected_address].forEach( district => {
-        selectors["district-select"].addOption(district, district==profileData.district);
-    });
-    
-};
 
 let clears = {
-    "country-select": pickCountry,
-    "city-select": pickCity,
-    "address-select": pickAddress
+    "country-select": pickCountry
 }
 
 const submitData = (e) => {
     let first_name = document.getElementById("first-name-input").value;
     let last_name = document.getElementById("last-name-input").value;
 
+    let phone = parseInt(document.getElementById("phone-input").value);
+    if (!Number.isInteger(phone)) {
+        makeToast("failure", "Phone number not valid", 1000);
+        return;
+    }
+    let postal_code  = parseInt(document.getElementById("postal-code-input").value);
+    if (!Number.isInteger(postal_code)) {
+        makeToast("failure", "Postal code not vaild", 1000);
+        return;
+    }
 
     let data = `{
         "for_user": "${document.getElementById("email-input").value}",
@@ -218,8 +199,10 @@ const submitData = (e) => {
         "last_name": "${last_name}",
         "country": "${selectors["country-select"].getSelected()}",
         "city": "${selectors["city-select"].getSelected()}",
-        "address": "${selectors["address-select"].getSelected()}",
-        "district": "${selectors["district-select"].getSelected()}",
+        "district": "${document.getElementById("district-input").value}",
+        "phone": "${phone}",
+        "postal_code": "${postal_code}",
+        "address": "${document.getElementById("address-input").value}",
         "sub_type": "${selectors["sub-type-select"].getSelected()}"
     }`;
 
