@@ -12,6 +12,8 @@ class Fetch(Resource):
         try:
             user = tokens[request.headers["authorization"]]
             fetch_type = request.args.get("type")
+            print("fetch type", fetch_type)
+            print("user sub type", user.sub_type)
             if user.sub_type != "BOTH" and fetch_type != user.sub_type or fetch_type not in METHODS:
                 raise ValueError
 

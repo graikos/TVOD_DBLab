@@ -46,13 +46,12 @@ const fetchUserData = () => {
     enableLoader();
     req.onreadystatechange = () => {
         if (req.readyState == 4) {
+            disableLoader();
             if (req.status == 200) {
                 resp = JSON.parse(req.response);
                 profileData = resp;
                 insertProfileData(resp);
-                disableLoader();
             } else {
-                disableLoader();
                 makeToast("failure", "Error fetching profile data", 1000);
             }
             fetchAddressData();
@@ -96,7 +95,7 @@ const fetchSubData = () => {
                 resp = JSON.parse(req.response);
                 resp.forEach(subtype => {
                     selectors["sub-type-select"].addOption(
-                        subtype[0].charAt(0) + subtype[0].slice(1).toLowerCase()
+                        subtype[0].charAt(0) + subtype[0].slice(1).toLowerCase(), !subtype[0].toLowerCase().localeCompare(profileData.sub_type.toLowerCase())
                     );
                 });
                 
@@ -183,7 +182,7 @@ const pickCountry = (new_selected_country) => {
 
 const pickCity = (new_selected_city) => {
     clearSelectors(["address-select", "district-select"]);
-    for (let address in globalAddressData[selectors["country-select"].options[selectors["country-select"].selected]][new_selected_city]) {
+    for (let address in globalAddressData[selectors["country-select"].getSelected()][new_selected_city]) {
         selectors["address-select"].addOption(address, address==profileData.address);
         if (profileData.address != address) {
             continue;
@@ -196,7 +195,7 @@ const pickCity = (new_selected_city) => {
 };
 
 const pickAddress = (new_selected_address) => {
-    globalAddressData[selectors["country-select"].options[selectors["country-select"].selected]][selectors["city-select"].options[selectors["city-select"].selected]][new_selected_address].forEach( district => {
+    globalAddressData[selectors["country-select"].getSelected()][selectors["city-select"].getSelected()][new_selected_address].forEach( district => {
         selectors["district-select"].addOption(district, district==profileData.district);
     });
     
@@ -206,4 +205,49 @@ let clears = {
     "country-select": pickCountry,
     "city-select": pickCity,
     "address-select": pickAddress
+}
+
+const submitData = (e) => {
+    let first_name = document.getElementById("first-name-input").value;
+    let last_name = document.getElementById("last-name-input").value;
+
+
+    let data = `{
+        "for_user": "${document.getElementById("email-input").value}",
+        "first_name": "${first_name}",
+        "last_name": "${last_name}",
+        "country": "${selectors["country-select"].getSelected()}",
+        "city": "${selectors["city-select"].getSelected()}",
+        "address": "${selectors["address-select"].getSelected()}",
+        "district": "${selectors["district-select"].getSelected()}",
+        "sub_type": "${selectors["sub-type-select"].getSelected()}"
+    }`;
+
+    let token = getCookie("sessid");
+    
+    let req = new XMLHttpRequest();
+    let url = hostname+profileEndpoint;
+    
+
+    url = encodeURI(url);
+    req.open("put", url);
+    req.setRequestHeader("Content-Type", "application/json");
+    req.setRequestHeader("Authorization", token);
+    req.send(data);
+
+    enableLoader();
+    req.onreadystatechange = () => {
+        if (req.readyState == 4) {
+            disableLoader();
+            if (req.status == 200) {
+                document.cookie = `first_name=${first_name}`;
+                document.cookie = `last_name=${last_name}`;
+                document.cookie = `sub_type=${selectors["sub-type-select"].getSelected().toUpperCase()}`;
+                makeToast("success", "Successfully updated profile", 1000);
+            } else {
+                makeToast("failure", "Error updating profile", 1000);
+            }
+        }
+    };
+    
 }

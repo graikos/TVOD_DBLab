@@ -37,6 +37,18 @@ class Address:
 
         return res
 
+    @staticmethod
+    def get_id_by_address(country, city, address, district):
+        cursor = dbconn.cursor()
+        cursor.execute("SELECT address.address_id " + \
+            "FROM country INNER JOIN city ON country.country_id=city.country_id " + \
+            "INNER JOIN address ON city.city_id=address.city_id " + \
+            "WHERE country.country=%s AND city.city=%s AND address.address=%s AND address.district=%s", (country, city, address, district))
+        res = cursor.fetchall()
+        cursor.close()
+
+        return res
+
 
 
 

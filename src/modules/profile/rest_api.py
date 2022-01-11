@@ -2,6 +2,8 @@ from flask_restful import Resource
 from flask import request, jsonify, make_response
 from storage import tokens
 from src.models.User.user_model import User, Administrator, Customer, Employee
+from src.models.Address.address_model import Address
+import json
 
 
 class Profile(Resource):
@@ -34,19 +36,27 @@ class Profile(Resource):
         try:
             # authenticate
             user = tokens[request.headers["authorization"]]
-            for_user = request.args.get("for_user")
+            data = json.loads(request.data)
+            for_user = data["for_user"]
             if not isinstance(user, Employee) and user.email != for_user:
                 raise ValueError
 
-            # ensure user is customer
-            new_customer = Customer()
-            new_customer.get_user_data_by_email(for_user)
+            if isinstance(user, Customer):
+                new_customer = user
+            else:
+                new_customer = Customer()
+                new_customer.get_user_data_by_email(for_user)
 
         except (KeyError, ValueError):
             return make_response(jsonify(""), 403)
 
-        new_customer.update_data(request.args.get("first_name"), request.args.get("last_name"),
-        request.args.get("address_id"), request.args.get("sub_type"))
+        address_id = Address.get_id_by_address(data["country"], data["city"],
+        data["address"], data["district"])[0][0]
+
+        new_customer.update_data(data["first_name"], data["last_name"],
+        address_id, data["sub_type"].upper())
+
+        print(new_customer.sub_type)
 
         return make_response(jsonify(""), 200)
 

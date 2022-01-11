@@ -73,9 +73,9 @@ class Customer(User):
             self.address_id = address_id
         if sub_type is not None:
             self.sub_type = sub_type
-
         cur = dbconn.cursor()
-        cur.execute("UPDATE customer SET first_name=%s, last_name=%s, address_id=%s, sub_type=%s WHERE email=%s", (self.first_name, self.last_name, self.address_id, self.sub_type, self.email))
+        cur.execute("UPDATE customer SET first_name=%s, last_name=%s, address_id=%s, subscription_type=%s WHERE email=%s", (self.first_name, self.last_name, self.address_id, self.sub_type, self.email))
+        dbconn.commit()
         cur.close()
         
 

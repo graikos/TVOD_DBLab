@@ -14,7 +14,6 @@ class Selector {
     }
 
     addOption(text, select) {
-        console.log(`adding ${text}`)
         let optionspan = document.createElement("span");
         let textspan = document.createElement("span");
         textspan.innerHTML = text;
@@ -64,6 +63,10 @@ class Selector {
         this.element.setAttribute("data-selected", "");
         this.element.getElementsByClassName("selected-option-text")[0].innerHTML = `<span>&nbsp;</span>`;
         this.element.getElementsByClassName("select-option-wrapper")[0].innerHTML = ``;
+    }
+
+    getSelected() {
+        return this.options[this.selected];
     }
     
 }
