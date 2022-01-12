@@ -8,11 +8,12 @@ class Selector {
         this.defaultText = defaultText;
         
         let currentOption = 0;
-        for (let option in options) {
+        options.forEach(option => {
             this.addOption(option, selected == currentOption);
             ++currentOption;
-        }
+        });
     }
+
 
     setText(text) {
         this.element.getElementsByClassName("selected-option-text")[0].innerHTML = `<span>${text}</span>`;
@@ -78,6 +79,29 @@ class Selector {
         return this.options[this.selected];
     }
     
+}
+
+const createSelector = (host_elem, options, default_idx, default_text) => {
+    let select = document.createElement("div");
+    select.classList.add("select");
+    select.setAttribute("data-selected", default_idx);
+    select.setAttribute("onclick", `selectClick(this)`);
+
+    let span = document.createElement("span");
+    span.classList.add("selected-option-text");
+    span.classList.add("select-option");
+    let spanspan = document.createElement("span");
+    spanspan.innerHTML = `${default_text}`;
+    span.appendChild(spanspan);
+    let menu = document.createElement("div");
+    menu.classList.add("select-option-wrapper");
+    menu.classList.add("invisible-select-menu");
+
+    select.appendChild(span);
+    select.appendChild(menu);
+
+    host_elem.append(select);
+    return new Selector(select, options, default_idx, undefined, default_text);
 }
 
 
@@ -155,4 +179,198 @@ const deleteAllCookies = () => {
         var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
         document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
     }
+}
+
+
+class TableCreator {
+    constructor(host_elem, cols, rows, id_col, actions) {
+        this.cols = cols;
+        this.host_elem = host_elem;
+        this.rows = rows;
+        this.actions = actions;
+        this.id_col = id_col;
+        this.tableRoot = undefined;
+        this.activeClose = false;
+    }
+
+    createTable(replace_host) {
+        this.tableRoot = document.createElement("table");
+        this.tableRoot.classList.add("data-table");
+
+        let headerRow = document.createElement("tr");
+        this.cols.forEach(col => {
+            let newHeader = document.createElement("th");
+            newHeader.innerHTML = col;
+            headerRow.appendChild(newHeader);
+        });
+        if (this.actions !== undefined) {
+            let newHeader = document.createElement("th");
+            newHeader.innerHTML = "Actions";
+            headerRow.appendChild(newHeader);
+        }
+        
+        this.tableRoot.appendChild(headerRow);
+
+        this.rows.forEach(row => {
+            let newtr = document.createElement("tr");
+            row.forEach(cell => {
+                let newtd = document.createElement("td");
+                if (cell === null) {
+                    cell = `<em>NA</em>`
+                } 
+                newtd.innerHTML = cell
+                newtr.appendChild(newtd);
+            });
+            if (this.actions !== undefined) {
+                let actiontd = document.createElement("td");
+                for (let action_name in this.actions) {
+                    let actionspan = document.createElement("span");
+                    actionspan.classList.add("material-icons");
+                    actionspan.innerHTML = action_name;
+                    actionspan.setAttribute("data-row-id", row[this.id_col]);
+                    actionspan.addEventListener("click", this.actions[action_name]);
+                    actiontd.appendChild(actionspan);
+                }
+                newtr.append(actiontd);
+            }
+            this.tableRoot.appendChild(newtr);
+        });
+
+        if (replace_host) {
+            this.host_elem.innerHTML = ``;
+        }
+        this.host_elem.appendChild(this.tableRoot);
+    }
+
+    addInternalRow(rowData) {
+        this.rows.push(rowData);
+    }
+
+    appendRow(rowData) {
+        let newtr = document.createElement("tr");
+        row.forEach(cell => {
+            let newtd = document.createElement("td");
+            newtd.innerHTML = cell
+            newtr.appendChild(newtd);
+        });
+        if (this.actions !== undefined) {
+            let actiontd = document.createElement("td");
+            for (let action_name in this.actions) {
+                let actionspan = document.createElement("span");
+                actionspan.classList.add("material-icons");
+                actionspan.innerHTML = action_name;
+                actionspan.setAttribute("data-row-id", row[this.id_col]);
+                actionspan.addEventListener("click", this.actions[action_name]);
+                actiontd.appendChild(actionspan);
+            }
+            newtr.append(actiontd);
+        }
+        this.tableRoot.appendChild(newtr);
+    }
+
+    replaceHTMLRow(rowData, htmlrow) {
+        let tds = htmlrow.children;
+        for (let i=0; i < rowData.length; ++i) {
+            tds[i].innerHTML = `${rowData[i]}`;
+        }
+    }
+
+    replaceActionsInHTMLRow(new_actions, htmlrow) {
+        let actiontd = htmlrow.children[htmlrow.children.length-1];
+        let row_id = actiontd.children[0].getAttribute("data-row-id")
+
+        actiontd.innerHTML = ``;
+        for (let action_name in new_actions) {
+            let actionspan = document.createElement("span");
+            actionspan.classList.add("material-icons");
+            actionspan.innerHTML = action_name;
+            actionspan.setAttribute("data-row-id", row_id);
+            actionspan.addEventListener("click", new_actions[action_name]);
+            actiontd.appendChild(actionspan);
+        }
+    }
+
+    editHTMLRow(types, htmlrow, onSave, selects) {
+        if (this.activeClose) {
+            return;
+        }
+
+        let tds = htmlrow.children;
+        let oldrow = [];
+        for (let i=0; i< tds.length; ++i) {
+            oldrow.push(tds[i].innerHTML);
+        }
+
+        let inputs = {};
+        for (let i=0; i < types.length; ++i) {
+            if (types[i] === undefined) {
+                continue;
+            }
+            let w = tds[i].offsetWidth;
+            let col = this.cols[i].toLocaleLowerCase();
+            if (types[i] == "text") {
+                tds[i].innerHTML = `<input type="text" value="${tds[i].innerHTML}" style="max-width:${w}px" class="edit-row-input">`;
+                inputs[col] = tds[i].children[0];
+            } else {
+                let oldval = tds[i].innerHTML;
+                tds[i].innerHTML= ``;
+                inputs[col] = createSelector(tds[i], [1,2,3], -1, `${oldval}`);
+
+                document.body.addEventListener("click", (e) => {
+                    if (!inputs[col].element.contains(e.target)) {
+                        let menu = inputs[col].element.getElementsByClassName("select-option-wrapper")[0];
+                        menu.classList.add("invisible-select-menu");
+                    }
+                });
+            }
+        }
+        this.confirmHTMLRow(oldrow, tds, htmlrow, onSave, inputs);
+    }
+
+    confirmHTMLRow(oldrow, tds, htmlrow, onSave, inputs) {
+        let actiontd = tds[tds.length-1];
+        let row_id = actiontd.children[0].getAttribute("data-row-id");
+
+        actiontd.innerHTML = ``;
+        let done = document.createElement("span");
+        done.classList.add("material-icons");
+        done.innerHTML = `done`;
+        done.setAttribute("data-row-id", row_id);
+        done.addEventListener("click", (e) => {
+
+            let values = []
+            for (let i = 0; i < tds.length-1; ++i) {
+                let col = this.cols[i].toLocaleLowerCase();
+                if (inputs[col] === undefined) {
+                    values.push(tds[i].innerHTML);
+                } else {
+                    if (inputs[col] instanceof Element) {
+                        values.push(inputs[col].value);
+                    } else if (inputs[col].constructor.name == "Selector") {
+                        values.push(inputs[col].getSelected());
+                    }
+                }
+            }
+
+            onSave(e, values);
+        });
+        actiontd.appendChild(done);
+
+        let cancel = document.createElement("span");
+        cancel.classList.add("material-icons");
+        cancel.innerHTML = `close`;
+        cancel.setAttribute("data-row-id", row_id);
+        const cancelAction = () => {
+
+            this.replaceHTMLRow(oldrow.slice(0, oldrow.length-1), htmlrow);
+            this.replaceActionsInHTMLRow(this.actions, htmlrow);
+            this.activeClose = false;
+
+        }
+        this.activeClose = true;
+        cancel.addEventListener("click",cancelAction);
+
+        actiontd.appendChild(cancel);
+    }
+
 }

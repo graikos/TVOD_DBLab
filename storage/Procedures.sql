@@ -31,7 +31,7 @@ END$
 DROP PROCEDURE IF EXISTS profits_by_month$
 CREATE PROCEDURE profits_by_month()
 BEGIN
-    SELECT YEAR(payment_date) AS p_y, MONTH(payment_date) AS p_m, SUM(amount) FROM payment GROUP BY p_y, p_m;
+    SELECT YEAR(payment_date) AS p_y, MONTH(payment_date) AS p_m, SUM(amount) FROM payment GROUP BY p_y, p_m ORDER BY p_y DESC;
 END$
 
 DROP PROCEDURE IF EXISTS actor_name_range$

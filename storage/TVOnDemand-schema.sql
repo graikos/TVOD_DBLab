@@ -133,7 +133,8 @@ CREATE TABLE customer (
   subscription_type ENUM('FILMS', 'SHOWS', 'BOTH'),
   pass_hash CHAR(64) NOT NULL,
   pass_salt CHAR(8) NOT NULL,
-  PRIMARY KEY  (customer_id),
+  PRIMARY KEY (customer_id),
+  UNIQUE (email),
   CONSTRAINT fk_customer_address FOREIGN KEY (address_id) REFERENCES address (address_id) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT fk_subscription_type FOREIGN KEY (subscription_type) REFERENCES subscription(subscription_type) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -153,6 +154,7 @@ CREATE TABLE employee (
   pass_hash CHAR(64) NOT NULL,
   pass_salt CHAR(8) NOT NULL,
   PRIMARY KEY  (employee_id),
+  UNIQUE (email),
   CONSTRAINT fk_employee_address FOREIGN KEY (address_id) REFERENCES address (address_id) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -170,6 +172,7 @@ CREATE TABLE administrator (
   pass_hash CHAR(64) NOT NULL,
   pass_salt CHAR(8) NOT NULL,
   PRIMARY KEY  (administrator_id),
+  UNIQUE (email),
   CONSTRAINT fk_administrator_address FOREIGN KEY (address_id) REFERENCES address (address_id) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

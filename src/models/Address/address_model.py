@@ -2,6 +2,37 @@ from storage import dbconn
 
 
 class Address:
+    def __init__(self, address_id, address, district, city_id, postal_code, phone):
+        self.address_id = address_id
+        self.address = address
+        self.district = district
+        self.city_id = city_id
+        self.postal_code = postal_code
+        self.phone = phone
+
+    def to_dict(self):
+        return {
+            "address_id": self.address_id,
+            "address": self.address,
+            "district": self.district,
+            "city_id": self.city_id,
+            "posal_code": self.postal_code,
+            "phone": self.phone
+        }
+
+    @staticmethod
+    def get_addresses(start, end):
+        cur = dbconn.cursor()
+        cur.execute("SELECT * FROM address LIMIT %s,%s", (start, end))
+        res = cur.fetchall()
+        cur.close()
+
+        addresses = []
+        for address in res:
+            addresses.append(Address(*address))
+
+        return addresses
+
     @staticmethod
     def get_all():
         cursor = dbconn.cursor()
@@ -75,6 +106,20 @@ class Address:
         cursor.close()
 
         return address_id
+
+    @staticmethod
+    def update_address(address_id, address, district, city_id, postal_code, phone):
+        cur = dbconn.cursor()
+        cur.execute("UPDATE address SET address=%s,district=%s,city_id=%s,postal_code=%s,phone=%s WHERE address_id=%s", (address, district, city_id, postal_code, phone, address_id))
+        cur.commit()
+        cur.close()
+
+    @staticmethod
+    def delete_address(address_id):
+        cur = dbconn.cursor()
+        cur.execute("DELETE FROM address WHERE address_id=%s", (address_id,))
+        cur.commit()
+        cur.close()
 
 
 

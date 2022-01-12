@@ -53,6 +53,7 @@ class Show:
                     "season_number": season[3],
                     "episodes": season[4]
                 })
+            season_list.sort(key = lambda season_dict: season_dict["season_number"])
             cur.execute("SELECT name FROM language WHERE language_id=%s", (show[4],))
             language = cur.fetchall()
             language = language[0] if language else None
@@ -66,6 +67,44 @@ class Show:
         cur.close()
 
         return shows
+
+    @staticmethod
+    def get_all_shows(start, end):
+        cur = dbconn.cursor()
+        cur.execute("SELECT * FROM tv_show LIMIT %s,%s", (start, end))
+        res = cur.fetchall()
+        cur.close()
+
+        return res
+
+    @staticmethod
+    def add_show(title, description, release_year, language_id, original_language_id, length, rating, special_features, seasons):
+        # seasons: dict of type {season_number: episodes}
+        cur = dbconn.cursor()
+        cur.execute("INSERT INTO tv_show(title, description, release_year, language_id, original_language_id, length, rating, special_features) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (title, description, release_year, language_id, original_language_id, length, rating, special_features))
+        cur.execute("SELECT LAST_INSERT_ID()")
+        new_show_id = cur.fetchall()[0][0]
+
+        for season in seasons:
+            cur.execute("INSERT INTO season(show_id, season_number, episodes) VALUES (%s, %s, %s)", (new_show_id, season, seasons[season]))
+
+        cur.commit()
+        cur.close()
+
+    @staticmethod
+    def update_film(show_id, description, release_year, language_id, original_language_id, length, rating, special_features):
+        cur = dbconn.cursor()
+        cur.execute("UPDATE tv_show SET title=%s,description=%s,release_year=%s,language_id=%s,original_language_id=%s,length=%s,rating=%s,special_features=%s WHERE film_id=%s", (description, release_year, language_id, original_language_id, length, rating, special_features, film_id))
+        cur.commit()
+        cur.close()
+
+    @staticmethod
+    def delete_show(show_id):
+        cur = dbconn.cursor()
+        cur.execute("DELETE FROM tv_show WHERE show_id=%s", (show_id,))
+        cur.commit()
+        cur.close()
+
 
 
 

@@ -111,6 +111,7 @@ const fetchData = () => {
                     loadedAll = true;
                     return;
                 }
+                console.log(resp);
                 resp.forEach(entry => {
                     if (currentTab == "FILMS") {
                         addFilmCard(entry);
@@ -252,6 +253,37 @@ const rentDialog = (e) => {
         ratingDetails.innerHTML = `<span>Rating: </span>` + currentData[entry_id].rating;
     } else {
         ratingDetails.classList.add("hidden-details");
+    }
+
+    languages = "";
+    currentData[entry_id].language.forEach(lang => {
+         languages += (", " + lang);
+    });
+
+    let languageDetails = document.getElementById("languages-details");
+    if (currentData[entry_id].language.length > 0) {
+        languages = languages.slice(2);
+        languageDetails.classList.remove("hidden-details");
+        languageDetails.innerHTML = `<span>Languages: </span>` + languages;
+    } else {
+        languageDetails.classList.add("hidden-details");
+    }
+    
+    oglanguages = "";
+    let ogLangDetails = document.getElementById("og-languages-details");
+    if (currentData[entry_id.original_language]) {
+        currentData[entry_id].original_language.forEach(lang => {
+            oglanguages += (", " + lang);
+        });
+        if (currentData[entry_id].original_language.length > 0) {
+            oglanguages = oglanguages.slice(2);
+            ogLangDetails.classList.remove("hidden-details");
+            ogLangDetails.innerHTML = `<span>Original Language: </span>` + oglanguages;
+        } else {
+            ogLangDetails.classList.add("hidden-details");
+        }
+    } else {
+        ogLangDetails.classList.add("hidden-details");
     }
 
     categories = "";

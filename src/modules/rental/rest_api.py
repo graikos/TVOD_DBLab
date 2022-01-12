@@ -1,7 +1,7 @@
 from flask_restful import Resource
 from flask import request, jsonify, make_response
 from storage import tokens
-from src.models.User.user_model import Customer, Employee
+from src.models.User.user_model import Customer, Employee, Administrator
 from src.models.Rental import rental_model
 import json
 
@@ -10,15 +10,28 @@ class Rental(Resource):
     def get(self):
         try:
             user = tokens[request.headers["authorization"]]
-            for_user = request.args.get("for_user")
-            if not isinstance(user, Employee) and user.email != for_user:
-                raise ValueError
-            requested_data = rental_model.Rental.get_rentals_for_customer(request.args.get("for_user"))
+            if "for_user" in request.args:
+                if not isinstance(user, Employee) and user.email != request.args.get("for_user"):
+                    raise ValueError
+
+                requested_data = rental_model.Rental.get_rentals_for_customer(request.args.get("for_user"))
+
+            elif "most_rented" in request.args:
+                if not isinstance(user, Employee) or request.args["most_rented"] not in {"m", "s"}:
+                    raise ValueError
+
+                requested_data = rental_model.Rental.get_most_rented(most_rented_type)
+            elif "income" in request.args:
+                if not isinstance(user, Administrator):
+                    raise ValueError
+
+                requested_data = rental_model.Rental.get_income()
+            else:
+                raise KeyError
 
         except (KeyError, ValueError):
             return make_response(jsonify(""), 403)
 
-        
         return make_response(jsonify(requested_data), 200)
 
     def post(self):

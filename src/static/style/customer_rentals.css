@@ -1,0 +1,15 @@
+.main-content {
+    position: relative;
+    display: inline-block;
+    top: 90px;
+    width: 80%;
+    left: 20%;
+    text-align: center;
+}
+
+.no-rentals-text {
+    font-family: "Inter";
+    font-weight: 400;
+    font-size: 25px;
+    color: rgb(61, 61, 61);
+}

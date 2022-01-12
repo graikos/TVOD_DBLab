@@ -10711,7 +10711,6 @@ INSERT INTO `inventory` (`inventory_id`, `film_id`, `item_type`) VALUES
 (1694, 369, 'FILM'),
 (2393, 522, 'FILM'),
 (793, 173, 'FILM'),
-(363, 79, 'FILM'),
 (4260, 926, 'FILM'),
 (782, 170, 'FILM'),
 (2220, 480, 'FILM'),

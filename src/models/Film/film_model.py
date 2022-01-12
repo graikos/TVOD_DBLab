@@ -57,8 +57,33 @@ class Film:
 
         return films
 
+    @staticmethod
+    def get_all_films(start, end):
+        cur = dbconn.cursor()
+        cur.execute("SELECT * FROM film LIMIT %s,%s", (start, end))
+        res = cur.fetchall()
+        cur.close()
 
+        return res
 
+    @staticmethod
+    def add_film(title, description, release_year, language_id, original_language_id, length, rating, special_features):
+        cur = dbconn.cursor()
+        cur.execute("INSERT INTO film(title, description, release_year, language_id, original_language_id, length, rating, special_features) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (title, description, release_year, language_id, original_language_id, length, rating, special_features))
+        cur.commit()
+        cur.close()
 
+    @staticmethod
+    def update_film(film_id, description, release_year, language_id, original_language_id, length, rating, special_features):
+        cur = dbconn.cursor()
+        cur.execute("UPDATE film SET title=%s,description=%s,release_year=%s,language_id=%s,original_language_id=%s,length=%s,rating=%s,special_features=%s WHERE film_id=%s", (description, release_year, language_id, original_language_id, length, rating, special_features, film_id))
+        cur.commit()
+        cur.close()
 
+    @staticmethod
+    def delete_film(film_id):
+        cur = dbconn.cursor()
+        cur.execute("DELETE FROM film WHERE film_id=%s", (film_id,))
+        cur.commit()
+        cur.close()
 

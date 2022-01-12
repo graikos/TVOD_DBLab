@@ -54,6 +54,7 @@
 body {
     margin: 0;
     padding: 0;
+    min-height: 100vh;
     font-family: sans-serif;
     background-color: #000;
 }
@@ -329,4 +330,100 @@ body {
 
 .active-option {
     background-color: rgb(44, 44, 44);
+}
+
+.data-table {
+    position: relative;
+    width: 90%;
+    left: 5%;
+    border-collapse: collapse;
+    border-radius: 3px;
+    overflow: hidden;
+    opacity: 0;
+    margin-bottom: 50px;
+    animation: tableenter .25s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes tableenter {
+    from {
+        opacity: 0;
+        left: 2%;
+    } to {
+        opacity: 1;
+        left: 5%;
+    }
+}
+
+.data-table th, .data-table td {
+    line-height: 30px;
+    font-family: "Inter";
+    padding-top: 7px;;
+    padding-bottom: 7px;;
+    font-size: 18px;
+}
+
+.data-table th {
+    background-color: #AD1457;
+    color: white;
+}
+
+.data-table td {
+    visibility: visible;
+    color: white;
+    margin-top: 14px;
+    position: relative;
+}
+
+.data-table tr {
+    background-color: #191919;
+}
+
+.data-table .material-icons {
+    cursor: pointer;
+    transition: all .15s;
+}
+
+.data-table .material-icons:hover {
+    color: #AD1457;
+}
+
+.data-table tr:nth-child(odd) {
+  background-color: #2b2b2b;
+}
+
+
+
+.edit-row-input {
+    display: inline-block;
+    outline: none;
+    padding:0;
+    margin:0;
+    border:none;
+    line-height: 20px;
+    position: relative;
+    width:90%;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    font-size: 16px;
+    color: #fff;
+    font-family: "Inter";
+    text-align: center;
+    font-weight: 400;
+    background-color: #1C1C1C;
+    border-radius: 2px;
+    box-shadow: 0px 2px #1C1C1C;
+    transition: all .15s;
+}
+
+.edit-row-input:focus {
+    box-shadow: 0px 2px #AD1457;
+}
+
+.hidden-cell {
+    visibility: hidden !important;
+}
+
+.fixed-table {
+    table-layout: fixed;
 }

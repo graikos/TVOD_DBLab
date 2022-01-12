@@ -47,6 +47,23 @@ def my_account():
     
     return render_template("customer_settings.html")
 
+
+@app.route("/myrentals")
+def my_rentals():
+    try:
+        token = request.cookies["sessid"]
+        user = tokens[token]
+        if not isinstance(user, Customer):
+            raise ValueError
+
+    except (KeyError, ValueError):
+        resp = redirect("/login")
+        resp.delete_cookie("sessid")
+        return resp
+
+    
+    return render_template("customer_rentals.html")
+
 @app.route("/login")
 def login():
     return render_template("login.html")
