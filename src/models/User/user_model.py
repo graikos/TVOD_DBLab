@@ -16,7 +16,12 @@ class User(abc.ABC):
         self.email = None
         self.first_name = None
         self.last_name = None
-        self.address_id = None
+        self.country = None
+        self.city = None
+        self.address = None
+        self.district = None
+        self.postal_code = None
+        self.phone = None
         self.active = None
         self.create_date = None
         self.sub_type = None
@@ -33,9 +38,9 @@ class User(abc.ABC):
         self.email = email
         self.first_name = res[1]
         self.last_name = res[2]
-        self.address_id = res[4]
         self.active = res[5]
         self.create_date = res[6]
+        self.get_address_data_by_id(res[4])
 
         pass_hash_index, pass_salt_index = 7, 8
         if isinstance(self, Customer):
@@ -43,6 +48,33 @@ class User(abc.ABC):
             pass_hash_index, pass_salt_index = 8, 9
 
         return res[pass_hash_index], res[pass_salt_index]
+
+    def get_address_data_by_id(self, address_id):
+        address_data = address_model.Address.get_address_by_id(address_id)
+        if not address_data:
+            raise ValueError
+
+        self.country = address_data[0]
+        self.city = address_data[1]
+        self.address = address_data[2]
+        self.district = address_data[3]
+        self.postal_code = address_data[4]
+        self.phone = address_data[5]
+
+
+    def to_dict(self):
+        return {
+            "email": self.email,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "create_date": self.create_date,
+            "sub_type": self.sub_type,
+            "country": self.country,
+            "city": self.city,
+            "address": self.address,
+            "postal_code": self.postal_code,
+            "phone": self.phone
+        }
 
     @staticmethod
     def find_user_table(email):
@@ -82,20 +114,24 @@ class User(abc.ABC):
         
         return res[:4] + address_data + res[5:]
 
-    def to_dict(self):
-        return {
-            "email": self.email,
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "create_date": self.create_date,
-            "sub_type": self.sub_type
-        }
-
     @staticmethod
     def get_users(table, start, end):
         cur = dbconn.cursor()
-        cur.execute(f"SELECT email,first_name,last_name,create_date,sub_type FROM {table} LIMIT %s,%s", (start, end))
-        users = cur.fetchall()
+        cur.execute(f"SELECT email,first_name,last_name,create_date,subscription_type,address_id FROM {table} LIMIT %s,%s", (start, end))
+        res = cur.fetchall()
+
+        users = []
+
+        for user in res:
+            new_user = User()
+            new_user.email = user[0]
+            new_user.first_name = user[1]
+            new_user.last_name = user[2]
+            new_user.create_date = user[3]
+            new_user.sub_type = user[4]
+            new_user.get_address_data_by_id(user[5])
+            users.append(new_user)
+
         cur.close()
 
         return users

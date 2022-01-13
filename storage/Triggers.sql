@@ -1,5 +1,23 @@
 DELIMITER $
 
+-- Trigger for preventing renting the same film/episode on the same day
+DROP TRIGGER IF EXISTS prevent_rental$
+CREATE TRIGGER prevent_rental
+BEFORE INSERT ON rental
+FOR EACH ROW
+BEGIN
+    IF (NEW.season_id IS NULL) THEN
+        IF (EXISTS(SELECT rental_id FROM rental WHERE DATE(rental_date)=DATE(NEW.rental_date) AND inventory_id=NEW.inventory_id AND customer_id=NEW.customer_id)) THEN
+            SET NEW.rental_date = NULL;
+        END IF;
+    ELSE
+        IF (EXISTS(SELECT rental_id FROM rental WHERE DATE(rental_date)=DATE(NEW.rental_date) AND inventory_id=NEW.inventory_id AND customer_id=NEW.customer_id AND season_id=NEW.season_id AND episode_number=NEW.episode_number)) THEN
+            SET NEW.rental_date = NULL;
+        END IF;
+    END IF;
+
+END$
+
 -- Trigger for 50% sale on each third daily order
 DROP TRIGGER IF EXISTS sale$
 CREATE TRIGGER sale

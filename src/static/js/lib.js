@@ -81,7 +81,7 @@ class Selector {
     
 }
 
-const createSelector = (host_elem, options, default_idx, default_text) => {
+const createSelector = (host_elem, options, default_idx, default_text, selectAction) => {
     let select = document.createElement("div");
     select.classList.add("select");
     select.setAttribute("data-selected", default_idx);
@@ -101,7 +101,9 @@ const createSelector = (host_elem, options, default_idx, default_text) => {
     select.appendChild(menu);
 
     host_elem.append(select);
-    return new Selector(select, options, default_idx, undefined, default_text);
+    let sel = new Selector(select, options, default_idx, selectAction);
+    sel.setText(default_text);
+    return sel;
 }
 
 
@@ -192,8 +194,7 @@ class TableCreator {
         this.tableRoot = undefined;
         this.activeClose = false;
     }
-
-    createTable(replace_host) {
+    createTable(replace_host, loadMore) {
         this.tableRoot = document.createElement("table");
         this.tableRoot.classList.add("data-table");
 
@@ -240,13 +241,22 @@ class TableCreator {
             this.host_elem.innerHTML = ``;
         }
         this.host_elem.appendChild(this.tableRoot);
+
+        if (loadMore !== undefined) {
+            let btn = document.createElement("button");
+            btn.innerHTML = `Load More`;
+            btn.id = "load-more-btn";
+            btn.classList.add("load-more");
+            btn.addEventListener("click", loadMore);
+            this.host_elem.appendChild(btn);
+        }
     }
 
     addInternalRow(rowData) {
         this.rows.push(rowData);
     }
 
-    appendRow(rowData) {
+    appendRow(row) {
         let newtr = document.createElement("tr");
         row.forEach(cell => {
             let newtd = document.createElement("td");
@@ -290,7 +300,12 @@ class TableCreator {
         }
     }
 
-    editHTMLRow(types, htmlrow, onSave, selects) {
+    editHTMLRow(types, htmlrow, onSave, selectors) {
+        /*
+        options: [],
+        onSelect: action,
+        enclose: []
+        */
         if (this.activeClose) {
             return;
         }
@@ -302,6 +317,8 @@ class TableCreator {
         }
 
         let inputs = {};
+        let currentSelectors = [];
+        let j = 0;
         for (let i=0; i < types.length; ++i) {
             if (types[i] === undefined) {
                 continue;
@@ -311,10 +328,12 @@ class TableCreator {
             if (types[i] == "text") {
                 tds[i].innerHTML = `<input type="text" value="${tds[i].innerHTML}" style="max-width:${w}px" class="edit-row-input">`;
                 inputs[col] = tds[i].children[0];
-            } else {
+            } else if (types[i] == "select") {
                 let oldval = tds[i].innerHTML;
                 tds[i].innerHTML= ``;
-                inputs[col] = createSelector(tds[i], [1,2,3], -1, `${oldval}`);
+                inputs[col] = createSelector(tds[i], selectors[j].options, -1, `${oldval}`);
+                currentSelectors.push(inputs[col]);
+                j++;
 
                 document.body.addEventListener("click", (e) => {
                     if (!inputs[col].element.contains(e.target)) {
@@ -324,6 +343,16 @@ class TableCreator {
                 });
             }
         }
+
+
+        for (let i=0; i < currentSelectors.length; ++i) {
+            currentSelectors[i].onSelectedAction = (newSelected) => {
+                if (selectors[i].onSelect !== undefined) {
+                    selectors[i].onSelect(selectors[i].enclose.map(en => currentSelectors[en]), newSelected);
+                }
+            }
+        }
+
         this.confirmHTMLRow(oldrow, tds, htmlrow, onSave, inputs);
     }
 
@@ -347,7 +376,11 @@ class TableCreator {
                     if (inputs[col] instanceof Element) {
                         values.push(inputs[col].value);
                     } else if (inputs[col].constructor.name == "Selector") {
-                        values.push(inputs[col].getSelected());
+                        if (inputs[col].getSelected() === undefined) {
+                            values.push(inputs[col].defaultText);
+                        } else {
+                            values.push(inputs[col].getSelected());
+                        }
                     }
                 }
             }

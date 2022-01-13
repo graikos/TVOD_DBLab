@@ -45,7 +45,8 @@ const fetchRentals = () => {
 const createRentalsTable = (rentalsData) => {
     if (rentalsData.length == 0) {
         let norentals = document.createElement("h2");
-        norentals.classList.add("no-rentals-text");
+        norentals.classList.add("no-entries-text");
+        norentals.innerHTML = `No rentals found`;
         document.getElementsByClassName["main-content"][0].appendChild(norentals);
         return;
     }

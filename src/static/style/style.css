@@ -360,7 +360,7 @@ body {
     font-family: "Inter";
     padding-top: 7px;;
     padding-bottom: 7px;;
-    font-size: 18px;
+    font-size: 14px;
 }
 
 .data-table th {
@@ -405,7 +405,7 @@ body {
     width:90%;
     padding-top: 7px;
     padding-bottom: 7px;
-    font-size: 16px;
+    font-size: 14px;
     color: #fff;
     font-family: "Inter";
     text-align: center;
@@ -426,4 +426,42 @@ body {
 
 .fixed-table {
     table-layout: fixed;
+}
+
+
+
+.no-entries-text {
+    font-family: "Inter";
+    font-weight: 400;
+    font-size: 25px;
+    color: rgb(61, 61, 61);
+}
+
+.load-more {
+    position:relative;
+    display: inline-block;
+    font-family: "Inter";
+    font-weight: 400;
+    font-size: 14px;
+    text-decoration: none;
+    margin-bottom: 100px;
+    color: white;
+    width: 200px;
+    line-height: 35px;
+    border-radius: 3px;
+    background-color: #AD1457;
+    text-align: center;
+    cursor: pointer;
+    left: calc(50% - 50px);
+    outline:none;
+    border:none;
+    animation: tableenter .25s;
+    animation-fill-mode: forwards;
+    transition: all .25s;
+}
+.load-more:hover {
+    background-color: #ce2d73;
+}
+.load-more:active {
+    background-color: #72163e;
 }

@@ -9,8 +9,8 @@ API.init_app(app)
 user_type_to_page = {
     "main": {
         Customer: "main_customer.html", 
-        Employee: "main_employee.html", 
-        Administrator: "main_administrator.html"
+        Employee: "all_customers.html", 
+        Administrator: "all_customers.html"
     },
 }
 
@@ -63,6 +63,27 @@ def my_rentals():
 
     
     return render_template("customer_rentals.html")
+
+@app.route("/allcustomers")
+def all_customers():
+    user_type = ""
+    try:
+        token = request.cookies["sessid"]
+        user = tokens[token]
+        if isinstance(user,Employee):
+            user_type = "Employee"
+        elif isinstance(user, Administrator):
+            user_type = "Administrator"
+        else:
+            raise ValueError
+
+    except (KeyError, ValueError):
+        resp = redirect("/login")
+        resp.delete_cookie("sessid")
+        return resp
+
+    
+    return render_template("all_customers.html", user_type=user_type)
 
 @app.route("/login")
 def login():

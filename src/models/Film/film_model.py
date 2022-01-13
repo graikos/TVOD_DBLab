@@ -62,9 +62,26 @@ class Film:
         cur = dbconn.cursor()
         cur.execute("SELECT * FROM film LIMIT %s,%s", (start, end))
         res = cur.fetchall()
+
+        films = []
+        for film in res:
+            cur.execute("SELECT name FROM category INNER JOIN film_category ON category.category_id=film_category.category_id WHERE film_category.film_id=%s", (film[0],))
+            categories = cur.fetchall()
+            cur.execute("SELECT first_name, last_name FROM actor INNER JOIN film_actor ON actor.actor_id=film_actor.actor_id WHERE film_actor.film_id=%s", (film[0],))
+            actors = cur.fetchall()
+            cur.execute("SELECT name FROM language WHERE language_id=%s", (film[4],))
+            language = cur.fetchall()
+            language = language[0] if language else None
+            cur.execute("SELECT name FROM language WHERE language_id=%s", (film[5],))
+            original_language = cur.fetchall()
+            original_language = original_language[0] if original_language else None
+
+            films.append(Film(film[0], film[1], film[2], film[3], language, original_language, film[6],
+            film[7], film[8], categories, actors))
+
         cur.close()
 
-        return res
+        return films
 
     @staticmethod
     def add_film(title, description, release_year, language_id, original_language_id, length, rating, special_features):

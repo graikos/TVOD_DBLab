@@ -1,8 +1,8 @@
 let hostname = window.location.href.split("/");
 hostname = hostname.slice(0, hostname.length-1).join("/");
-const profileEndpoint = "/api/profile"
-const addressEndpoint = "/api/address"
-const subscriptionEndpoint = "/api/subscription"
+const profileEndpoint = "/api/profile";
+const addressEndpoint = "/api/address";
+const subscriptionEndpoint = "/api/subscription";
 
 let dropdown_IDS = ["country-select", "city-select", "sub-type-select"];
 let profileData = {};
@@ -165,9 +165,6 @@ const pickCountry = (new_selected_country) => {
     clearSelectors(["city-select"]);
     for (let city in globalAddressData[new_selected_country]) {
         selectors["city-select"].addOption(city, city==profileData.city);
-        if (profileData.city != city) {
-            continue;
-        }
     }
 
 };

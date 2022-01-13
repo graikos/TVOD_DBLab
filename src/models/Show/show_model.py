@@ -73,9 +73,38 @@ class Show:
         cur = dbconn.cursor()
         cur.execute("SELECT * FROM tv_show LIMIT %s,%s", (start, end))
         res = cur.fetchall()
+
+        shows = []
+
+        for show in res:
+            cur.execute("SELECT name FROM category INNER JOIN tv_show_category ON category.category_id=tv_show_category.category_id WHERE tv_show_category.show_id=%s", (show[0],))
+            categories = cur.fetchall()
+            cur.execute("SELECT first_name, last_name FROM actor INNER JOIN tv_show_actor ON actor.actor_id=tv_show_actor.actor_id WHERE tv_show_actor.show_id=%s", (show[0],))
+            actors = cur.fetchall()
+            cur.execute("SELECT * FROM season WHERE show_id=%s ORDER BY release_year, season_id ASC", (show[0],))
+            seasons = cur.fetchall()
+            season_list = []
+            for season in seasons:
+                season_list.append({
+                    "season_id": season[0],
+                    "show_id": season[1],
+                    "release_year": season[2],
+                    "season_number": season[3],
+                    "episodes": season[4]
+                })
+            season_list.sort(key = lambda season_dict: season_dict["season_number"])
+            cur.execute("SELECT name FROM language WHERE language_id=%s", (show[4],))
+            language = cur.fetchall()
+            language = language[0] if language else None
+            cur.execute("SELECT name FROM language WHERE language_id=%s", (show[5],))
+            original_language = cur.fetchall()
+            original_language = original_language[0] if original_language else None
+
+            shows.append(Show(show[0], show[1], show[2], show[3], language, original_language, season_list, show[6], show[7], categories, actors))
+
         cur.close()
 
-        return res
+        return shows
 
     @staticmethod
     def add_show(title, description, release_year, language_id, original_language_id, length, rating, special_features, seasons):
