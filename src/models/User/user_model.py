@@ -72,6 +72,7 @@ class User(abc.ABC):
             "country": self.country,
             "city": self.city,
             "address": self.address,
+            "district": self.district,
             "postal_code": self.postal_code,
             "phone": self.phone
         }

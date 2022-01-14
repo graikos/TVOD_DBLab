@@ -2,7 +2,7 @@ from flask import redirect, render_template, request
 from src import app
 from src.modules import API
 from src.models.User import Customer, Employee, Administrator
-from storage import dbconn, tokens
+from storage import tokens
 
 API.init_app(app)
 

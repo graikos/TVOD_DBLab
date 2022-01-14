@@ -6,6 +6,7 @@ class Selector {
         this.options = [];
         this.onSelectedAction = onSelectedAction;
         this.defaultText = defaultText;
+        this.selected = selected;
         
         let currentOption = 0;
         options.forEach(option => {
@@ -16,6 +17,7 @@ class Selector {
 
 
     setText(text) {
+        this.lastSetText = text;
         this.element.getElementsByClassName("selected-option-text")[0].innerHTML = `<span>${text}</span>`;
     }
 
@@ -76,6 +78,9 @@ class Selector {
     }
 
     getSelected() {
+        if (this.selected == -1 && this.lastSetText !== undefined) {
+            return this.lastSetText;
+        }
         return this.options[this.selected];
     }
     
@@ -194,9 +199,12 @@ class TableCreator {
         this.tableRoot = undefined;
         this.activeClose = false;
     }
-    createTable(replace_host, loadMore) {
+    createTable(replace_host, loadMore, scrollable) {
         this.tableRoot = document.createElement("table");
         this.tableRoot.classList.add("data-table");
+        if (scrollable) {
+            this.tableRoot.classList.add("scrollable-table");
+        }
 
         let headerRow = document.createElement("tr");
         this.cols.forEach(col => {
@@ -300,7 +308,7 @@ class TableCreator {
         }
     }
 
-    editHTMLRow(types, htmlrow, onSave, selectors) {
+    editHTMLRow(types, htmlrow, onSave, selectors, onClose) {
         /*
         options: [],
         onSelect: action,
@@ -353,7 +361,7 @@ class TableCreator {
             }
         }
 
-        this.confirmHTMLRow(oldrow, tds, htmlrow, onSave, inputs);
+        this.confirmHTMLRow(oldrow, tds, htmlrow, onSave, inputs, onClose);
     }
 
     confirmHTMLRow(oldrow, tds, htmlrow, onSave, inputs) {
@@ -376,11 +384,7 @@ class TableCreator {
                     if (inputs[col] instanceof Element) {
                         values.push(inputs[col].value);
                     } else if (inputs[col].constructor.name == "Selector") {
-                        if (inputs[col].getSelected() === undefined) {
-                            values.push(inputs[col].defaultText);
-                        } else {
-                            values.push(inputs[col].getSelected());
-                        }
+                        values.push(inputs[col].getSelected());
                     }
                 }
             }
@@ -407,3 +411,24 @@ class TableCreator {
     }
 
 }
+
+
+
+createPopUp = (host_elem, ptitle) => {
+    let popup = document.createElement("div");
+    popup.classList.add("popup");
+    let x = document.createElement("span")
+    x.classList.add("material-icons");
+    x.classList.add("close");
+    x.innerHTML = `close`;
+    x.addEventListener("click", closePopUp);
+    popup.appendChild(x);
+    let title = document.createElement("h1")
+    title.innerHTML = `${ptitle}`;
+    popup.appendChild(title);
+    host_elem.insertBefore(popup, host_elem.firstChild);
+};
+
+closePopUp = (p) => {
+    p.target.parentNode.remove();
+};

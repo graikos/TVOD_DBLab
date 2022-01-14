@@ -67,7 +67,9 @@ class Profile(Resource):
                     if not isinstance(user, Administrator):
                         raise ValueError
 
-                    USER_TYPES[data["type"]].create_user(data["first_name"], data["last_name"], data["email"], data["address_id"], data["password"])
+                    address_id = Address.add_address(data["country"], data["city"], data["address"], data["district"], data["postal_code"], data["phone"])
+
+                    USER_TYPES[data["type"]].create_user(data["first_name"], data["last_name"], data["email"], address_id, data["password"])
                     return make_response(jsonify(""), 201)
 
 

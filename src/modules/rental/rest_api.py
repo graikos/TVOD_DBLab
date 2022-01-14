@@ -20,7 +20,7 @@ class Rental(Resource):
                 if not isinstance(user, Employee) or request.args["most_rented"] not in {"m", "s"}:
                     raise ValueError
 
-                requested_data = rental_model.Rental.get_most_rented(most_rented_type)
+                requested_data = rental_model.Rental.get_most_rented(request.args.get("most_rented"))
             elif "income" in request.args:
                 if not isinstance(user, Administrator):
                     raise ValueError

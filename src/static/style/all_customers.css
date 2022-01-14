@@ -2,8 +2,8 @@
     position: relative;
     display: inline-block;
     top: 90px;
-    width: 80%;
-    left: 20%;
+    width: 85%;
+    left: 15%;
     text-align: center;
 }
 .select {
@@ -15,4 +15,9 @@
 
 .select-option span {
     left:0;
+}
+
+.popup .data-table {
+    overflow-x: hidden;
+    white-space: auto;
 }
