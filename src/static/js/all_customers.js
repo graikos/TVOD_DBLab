@@ -197,8 +197,14 @@ const createRentalsTable = (rentalsData) => {
      tables["rentals_table"] = table;
 };
 let customerActions = {
-    "edit": editCustomer,
-    "description": viewRentalHistory
+    "edit": {
+        "func": editCustomer,
+        "desc": "Edit Customer"
+    },
+    "description": {
+        "func": viewRentalHistory,
+        "desc": "View Rentals"
+    }
 };
 
 const confirmEditCustomer = (e, values) => {

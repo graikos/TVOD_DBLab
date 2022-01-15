@@ -32,6 +32,7 @@ class City:
         cur.execute("SELECT country_id FROM country WHERE country.country=%s", (to_country,))
         res = cur.fetchall()
         if not res:
+            cur.close()
             raise ValueError
         
         country_id = res[0][0]
@@ -49,6 +50,6 @@ class City:
     @staticmethod
     def delete_city(city_id):
         cur = dbconn.cursor()
-        cur.execute("DELETE FROM city WHERE city_id=%s", (category_id,))
+        cur.execute("DELETE FROM city WHERE city_id=%s", (city_id,))
         cur.commit()
         cur.close()

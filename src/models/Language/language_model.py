@@ -27,9 +27,19 @@ class Language:
     @staticmethod
     def add_language(name):
         cur = dbconn.cursor()
+        cur.execute("SELECT * FROM language where name=%s", (name,))
+        res = cur.fetchall()
+        if res:
+            cur.close()
+            return res[0][0]
+
         cur.execute("INSERT INTO language (name) VALUES (%s)", (name,))
+        cur.execute("SELECT LAST_INSERT_ID()")
+        new_id = cur.fetchall()[0][0]
         cur.commit()
         cur.close()
+
+        return new_id
 
     @staticmethod
     def delete_language(language_id):

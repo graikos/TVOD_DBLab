@@ -27,11 +27,57 @@ class Actor:
         return actors
 
     @staticmethod
+    def get_actor_by_film_id(film_id):
+        cur = dbconn.cursor()
+        cur.execute("SELECT * FROM film_actor WHERE film_id=%s", (film_id,))
+        res = cur.fetchall()
+
+        actors = []
+        for actor in res:
+            cur.execute("SELECT * FROM actor WHERE actor_id=%s", (actor[0],))
+            actor = cur.fetchall()[0]
+            actors.append(Actor(*actor))
+
+        cur.close()
+
+        return actors
+
+    @staticmethod
+    def get_actor_by_show_id(show_id):
+        cur = dbconn.cursor()
+        cur.execute("SELECT * FROM tv_show_actor WHERE show_id=%s", (show_id,))
+        res = cur.fetchall()
+
+        actors = []
+        for actor in res:
+            cur.execute("SELECT * FROM actor WHERE actor_id=%s", (actor[0],))
+            actor = cur.fetchall()[0]
+            actors.append(Actor(*actor))
+
+        cur.close()
+
+        return actors
+
+    @staticmethod
     def add_actor(first_name, last_name):
         cur = dbconn.cursor()
+
+        cur.execute("SELECT * FROM actor WHERE first_name=%s AND last_name=%s", (first_name, last_name))
+        res = cur.fetchall()
+
+        if res:
+            cur.close()
+            return res[0][0]
+
         cur.execute("INSERT INTO actor (first_name, last_name) VALUES (%s,%s)", (first_name, last_name))
+        cur.execute("SELECT LAST_INSERT_ID()")
+        new_id = cur.fetchall()[0][0]
         cur.commit()
         cur.close()
+
+        return new_id
+
+
 
     @staticmethod
     def update_actor(actor_id, first_name, last_name):

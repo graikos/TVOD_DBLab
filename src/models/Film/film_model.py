@@ -1,5 +1,8 @@
 from storage import dbconn
-
+from src.models.lib import pack_values_into_sql_insert, get_value_tuple
+from src.models.Language.language_model import Language
+from src.models.Actor.actor_model import Actor
+from src.models.Category.category_model import Category
 
 
 class Film:
@@ -84,16 +87,53 @@ class Film:
         return films
 
     @staticmethod
-    def add_film(title, description, release_year, language_id, original_language_id, length, rating, special_features):
+    def add_film(title, description, release_year, language, original_language, length, rating, special_features):
         cur = dbconn.cursor()
+
+        language_id = Language.add_language(language)
+        original_language_id = Language.add_language(original_language)
+
         cur.execute("INSERT INTO film(title, description, release_year, language_id, original_language_id, length, rating, special_features) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (title, description, release_year, language_id, original_language_id, length, rating, special_features))
+        cur.execute("SELECT LAST_INSERT_ID()")
         cur.commit()
         cur.close()
 
     @staticmethod
-    def update_film(film_id, description, release_year, language_id, original_language_id, length, rating, special_features):
+    def update_film(film_id, title, description, release_year, language, original_language, length, rating, special_features):
         cur = dbconn.cursor()
-        cur.execute("UPDATE film SET title=%s,description=%s,release_year=%s,language_id=%s,original_language_id=%s,length=%s,rating=%s,special_features=%s WHERE film_id=%s", (description, release_year, language_id, original_language_id, length, rating, special_features, film_id))
+
+        language_id = Language.add_language(language)
+        original_language_id = Language.add_language(original_language)
+
+        cur.execute("UPDATE film SET title=%s,description=%s,release_year=%s,language_id=%s,original_language_id=%s,length=%s,rating=%s,special_features=%s WHERE film_id=%s", (title, description, release_year, language_id, original_language_id, length, rating, special_features, film_id))
+        cur.commit()
+        cur.close()
+
+    @staticmethod
+    def update_film_actors(film_id, actors):
+        actor_query_vals = []
+        for actor in actors:
+            actor_query_vals.append((Actor.add_actor(actor[0], actor[1]), film_id))
+
+        actor_query = pack_values_into_sql_insert("film_actor", len(actor_query_vals), 2)
+
+        cur = dbconn.cursor()
+        cur.execute("DELETE FROM film_actor WHERE film_id=%s", (film_id,))
+        cur.execute(actor_query, get_value_tuple(actor_query_vals))
+        cur.commit()
+        cur.close()
+
+    @staticmethod
+    def update_film_categories(film_id, categories):
+        category_query_vals = []
+        for category in categories:
+            category_query_vals.append((film_id, Category.add_category(category)))
+        
+        category_query = pack_values_into_sql_insert("film_category", len(category_query_vals), 2)
+
+        cur = dbconn.cursor()
+        cur.execute("DELETE FROM film_category WHERE film_id=%s", (film_id,))
+        cur.execute(category_query, get_value_tuple(category_query_vals))
         cur.commit()
         cur.close()
 
@@ -103,4 +143,3 @@ class Film:
         cur.execute("DELETE FROM film WHERE film_id=%s", (film_id,))
         cur.commit()
         cur.close()
-

@@ -148,11 +148,13 @@ const makeToast = (type, msg, duration) => {
 const enableLoader = () => {
     let loader = document.getElementById("main-loader");
     loader.classList.add("loader-visible");
+    hideLoadMore();
 }
 
 const disableLoader = () => {
     let loader = document.getElementById("main-loader");
     loader.classList.remove("loader-visible");
+    showLoadMore();
 }
 
 const selectClick = (e) =>  {
@@ -235,9 +237,10 @@ class TableCreator {
                 for (let action_name in this.actions) {
                     let actionspan = document.createElement("span");
                     actionspan.classList.add("material-icons");
+                    actionspan.setAttribute("title", this.actions[action_name].desc);
                     actionspan.innerHTML = action_name;
                     actionspan.setAttribute("data-row-id", row[this.id_col]);
-                    actionspan.addEventListener("click", this.actions[action_name]);
+                    actionspan.addEventListener("click", this.actions[action_name].func);
                     actiontd.appendChild(actionspan);
                 }
                 newtr.append(actiontd);
@@ -265,6 +268,7 @@ class TableCreator {
     }
 
     appendRow(row) {
+        this.rows.push(row);
         let newtr = document.createElement("tr");
         row.forEach(cell => {
             let newtd = document.createElement("td");
@@ -278,12 +282,14 @@ class TableCreator {
                 actionspan.classList.add("material-icons");
                 actionspan.innerHTML = action_name;
                 actionspan.setAttribute("data-row-id", row[this.id_col]);
-                actionspan.addEventListener("click", this.actions[action_name]);
+                actionspan.setAttribute("title", this.actions[action_name].desc);
+                actionspan.addEventListener("click", this.actions[action_name].func);
                 actiontd.appendChild(actionspan);
             }
             newtr.append(actiontd);
         }
         this.tableRoot.appendChild(newtr);
+        return newtr;
     }
 
     replaceHTMLRow(rowData, htmlrow) {
@@ -303,12 +309,13 @@ class TableCreator {
             actionspan.classList.add("material-icons");
             actionspan.innerHTML = action_name;
             actionspan.setAttribute("data-row-id", row_id);
-            actionspan.addEventListener("click", new_actions[action_name]);
+            actionspan.setAttribute("title", new_actions[action_name].desc);
+            actionspan.addEventListener("click", new_actions[action_name].func);
             actiontd.appendChild(actionspan);
         }
     }
 
-    editHTMLRow(types, htmlrow, onSave, selectors, onClose) {
+    editHTMLRow(types, htmlrow, onSave, selectors, onClose, focusInput) {
         /*
         options: [],
         onSelect: action,
@@ -336,6 +343,10 @@ class TableCreator {
             if (types[i] == "text") {
                 tds[i].innerHTML = `<input type="text" value="${tds[i].innerHTML}" style="max-width:${w}px" class="edit-row-input">`;
                 inputs[col] = tds[i].children[0];
+                if (focusInput) {
+                    inputs[col].focus();
+                    focusInput = false;
+                }
             } else if (types[i] == "select") {
                 let oldval = tds[i].innerHTML;
                 tds[i].innerHTML= ``;
@@ -364,7 +375,7 @@ class TableCreator {
         this.confirmHTMLRow(oldrow, tds, htmlrow, onSave, inputs, onClose);
     }
 
-    confirmHTMLRow(oldrow, tds, htmlrow, onSave, inputs) {
+    confirmHTMLRow(oldrow, tds, htmlrow, onSave, inputs, onClose) {
         let actiontd = tds[tds.length-1];
         let row_id = actiontd.children[0].getAttribute("data-row-id");
 
@@ -399,6 +410,12 @@ class TableCreator {
         cancel.setAttribute("data-row-id", row_id);
         const cancelAction = () => {
 
+            if (onClose !== undefined) {
+                onClose();
+                this.activeClose = false;
+                return;
+            }
+
             this.replaceHTMLRow(oldrow.slice(0, oldrow.length-1), htmlrow);
             this.replaceActionsInHTMLRow(this.actions, htmlrow);
             this.activeClose = false;
@@ -410,25 +427,58 @@ class TableCreator {
         actiontd.appendChild(cancel);
     }
 
+    getLastRow() {
+        return this.rows[this.rows.length-1];
+    }
+
 }
 
 
 
-createPopUp = (host_elem, ptitle) => {
+createPopUp = (host_elem, ptitle, objToClear, keyToClear) => {
     let popup = document.createElement("div");
     popup.classList.add("popup");
     let x = document.createElement("span")
     x.classList.add("material-icons");
     x.classList.add("close");
     x.innerHTML = `close`;
-    x.addEventListener("click", closePopUp);
+    x.addEventListener("click", (e) => {
+        closePopUp(e, objToClear, keyToClear);
+    });
     popup.appendChild(x);
     let title = document.createElement("h1")
     title.innerHTML = `${ptitle}`;
     popup.appendChild(title);
     host_elem.insertBefore(popup, host_elem.firstChild);
+    return popup;
 };
 
-closePopUp = (p) => {
+closePopUp = (p, objToClear, keyToClear) => {
     p.target.parentNode.remove();
+    delete objToClear[keyToClear];
 };
+
+addFloatingButton = (host_elem, type, action, source) => {
+    let btn = document.createElement("a");
+    btn.classList.add("floating-button");
+    btn.innerHTML = `<span class="material-icons">${type}</span>`
+    btn.addEventListener("click", action);
+    btn.setAttribute("data-active", "0");
+    btn.setAttribute("data-source", source);
+    host_elem.appendChild(btn);
+    return btn;
+}
+
+hideLoadMore = () => {
+    let loadmore = document.getElementById("load-more-btn");
+    if (loadmore !== null) {
+        loadmore.classList.add("hidden-element");
+    }
+}
+
+showLoadMore = () => {
+    let loadmore = document.getElementById("load-more-btn");
+    if (loadmore !== null) {
+        loadmore.classList.remove("hidden-element");
+    }
+}

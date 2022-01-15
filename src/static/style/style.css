@@ -343,7 +343,7 @@ body {
     border-collapse: collapse;
     text-align: center;
     opacity: 0;
-    margin-bottom: 50px;
+    margin-bottom: 150px;
     animation: tableenter .25s;
     animation-fill-mode: forwards;
 }
@@ -551,4 +551,39 @@ body {
         display: inline-block;
         opacity: 1;
     }
+}
+
+
+
+
+.floating-button {
+    position: fixed;
+    bottom: 50px;
+    right: 40px;
+    text-align: center;
+    width: 70px;
+    background-color: #AD1457;
+    border-radius: 70%;
+    text-decoration: none;
+    z-index: +11;
+    padding-left: 0px;
+    cursor: pointer;
+    box-shadow: 0 1px 4px 0 rgba(0,0,0,0.37);
+    color: white;
+    transition: all .25s;
+}
+
+.floating-button:hover {
+    background-color: #191919;
+}
+
+.floating-button span {
+    position: relative;
+    display: inline-block;
+    line-height: 70px;
+    width: 100%;
+}
+
+.hidden-element {
+    display: none;
 }

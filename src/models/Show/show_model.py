@@ -1,5 +1,8 @@
 from storage import dbconn
-
+from src.models.lib import pack_values_into_sql_insert, get_value_tuple
+from src.models.Language.language_model import Language
+from src.models.Actor.actor_model import Actor
+from src.models.Category.category_model import Category
 
 class Show:
     def __init__(self, show_id, title, description, release_year, language, original_language, seasons, rating, special_features, categories, actors):
@@ -42,16 +45,15 @@ class Show:
             categories = cur.fetchall()
             cur.execute("SELECT first_name, last_name FROM actor INNER JOIN tv_show_actor ON actor.actor_id=tv_show_actor.actor_id WHERE tv_show_actor.show_id=%s", (show[0],))
             actors = cur.fetchall()
-            cur.execute("SELECT * FROM season WHERE show_id=%s ORDER BY release_year, season_id ASC", (show[0],))
+            cur.execute("SELECT season_id,show_id,season_number,episodes FROM season WHERE show_id=%s ORDER BY release_year, season_id ASC", (show[0],))
             seasons = cur.fetchall()
             season_list = []
             for season in seasons:
                 season_list.append({
                     "season_id": season[0],
                     "show_id": season[1],
-                    "release_year": season[2],
-                    "season_number": season[3],
-                    "episodes": season[4]
+                    "season_number": season[2],
+                    "episodes": season[3]
                 })
             season_list.sort(key = lambda season_dict: season_dict["season_number"])
             cur.execute("SELECT name FROM language WHERE language_id=%s", (show[4],))
@@ -81,16 +83,15 @@ class Show:
             categories = cur.fetchall()
             cur.execute("SELECT first_name, last_name FROM actor INNER JOIN tv_show_actor ON actor.actor_id=tv_show_actor.actor_id WHERE tv_show_actor.show_id=%s", (show[0],))
             actors = cur.fetchall()
-            cur.execute("SELECT * FROM season WHERE show_id=%s ORDER BY release_year, season_id ASC", (show[0],))
+            cur.execute("SELECT season_id,show_id,season_number,episodes FROM season WHERE show_id=%s ORDER BY release_year, season_id ASC", (show[0],))
             seasons = cur.fetchall()
             season_list = []
             for season in seasons:
                 season_list.append({
                     "season_id": season[0],
                     "show_id": season[1],
-                    "release_year": season[2],
-                    "season_number": season[3],
-                    "episodes": season[4]
+                    "season_number": season[2],
+                    "episodes": season[3]
                 })
             season_list.sort(key = lambda season_dict: season_dict["season_number"])
             cur.execute("SELECT name FROM language WHERE language_id=%s", (show[4],))
@@ -107,23 +108,69 @@ class Show:
         return shows
 
     @staticmethod
-    def add_show(title, description, release_year, language_id, original_language_id, length, rating, special_features, seasons):
-        # seasons: dict of type {season_number: episodes}
+    def add_show(title, description, release_year, language, original_language, length, rating, special_features):
         cur = dbconn.cursor()
+
+        language_id = Language.add_language(language)
+        original_language_id = Language.add_language(original_language)
+
         cur.execute("INSERT INTO tv_show(title, description, release_year, language_id, original_language_id, length, rating, special_features) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (title, description, release_year, language_id, original_language_id, length, rating, special_features))
         cur.execute("SELECT LAST_INSERT_ID()")
-        new_show_id = cur.fetchall()[0][0]
-
-        for season in seasons:
-            cur.execute("INSERT INTO season(show_id, season_number, episodes) VALUES (%s, %s, %s)", (new_show_id, season, seasons[season]))
 
         cur.commit()
         cur.close()
 
     @staticmethod
-    def update_film(show_id, description, release_year, language_id, original_language_id, length, rating, special_features):
+    def update_show(show_id, title, description, release_year, language, original_language, length, rating, special_features):
         cur = dbconn.cursor()
-        cur.execute("UPDATE tv_show SET title=%s,description=%s,release_year=%s,language_id=%s,original_language_id=%s,length=%s,rating=%s,special_features=%s WHERE film_id=%s", (description, release_year, language_id, original_language_id, length, rating, special_features, film_id))
+
+        language_id = Language.add_language(language)
+        original_language_id = Language.add_language(original_language)
+
+        cur.execute("UPDATE tv_show SET title=%s,description=%s,release_year=%s,language_id=%s,original_language_id=%s,length=%s,rating=%s,special_features=%s WHERE show_id=%s", (title, description, release_year, language_id, original_language_id, length, rating, special_features, show_id))
+        cur.commit()
+        cur.close()
+
+    @staticmethod
+    def update_show_actors(show_id, actors):
+        actor_query_vals = []
+        for actor in actors:
+            actor_query_vals.append((Actor.add_actor(actor[0], actor[1]), show_id))
+
+        actor_query = pack_values_into_sql_insert("tv_show_actor", len(actor_query_vals), 2)
+
+        cur = dbconn.cursor()
+        cur.execute("DELETE FROM tv_show_actor WHERE show_id=%s", (show_id,))
+        cur.execute(actor_query, get_value_tuple(actor_query_vals))
+        cur.commit()
+        cur.close()
+
+    @staticmethod
+    def update_show_categories(show_id, categories):
+        category_query_vals = []
+        for category in categories:
+            category_query_vals.append((show_id, Category.add_category(category)))
+
+        category_query = pack_values_into_sql_insert("tv_show_category", len(category_query_vals), 2)
+
+        cur = dbconn.cursor()
+        cur.execute("DELETE FROM tv_show_category WHERE show_id=%s", (show_id,))
+        cur.execute(category_query, get_value_tuple(category_query_vals))
+        cur.commit()
+        cur.close()
+
+    @staticmethod
+    def update_show_seasons(show_id, seasons):
+        # seasons: dict of form {season_number: episodes}
+        season_query_vals = []
+        for season in seasons:
+            season_query_vals.append((show_id, season, seasons[season]))
+
+        season_query = pack_values_into_sql_insert("season", len(season_query_vals), 3, table_cols=("show_id", "season_number", "episodes"))
+
+        cur = dbconn.cursor()
+        cur.execute("DELETE FROM season WHERE show_id=%s", (show_id,))
+        cur.execute(season_query, get_value_tuple(season_query_vals))
         cur.commit()
         cur.close()
 
@@ -133,10 +180,3 @@ class Show:
         cur.execute("DELETE FROM tv_show WHERE show_id=%s", (show_id,))
         cur.commit()
         cur.close()
-
-
-
-
-
-
-

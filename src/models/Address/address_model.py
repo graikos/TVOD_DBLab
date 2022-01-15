@@ -90,12 +90,14 @@ class Address:
 
         # if it exists, return its id
         if res:
+            cursor.close()
             return res[0][0]
 
         # find city id
         cursor.execute("SELECT city_id FROM city INNER JOIN country ON city.country_id=country.country_id WHERE city.city=%s AND country.country=%s", (to_city, to_country))
         res = cursor.fetchall()
         if not res:
+            cursor.close()
             raise ValueError
         city_id = res[0][0]
 

@@ -1,0 +1,9 @@
+
+.main-content {
+    position: relative;
+    display: inline-block;
+    top: 90px;
+    width: 85%;
+    left: 15%;
+    text-align: center;
+}

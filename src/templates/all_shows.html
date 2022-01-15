@@ -3,18 +3,18 @@
     <head>
         <title>TVOnDemand</title>
         <link rel="stylesheet" href="../static/style/style.css">
-        <link rel="stylesheet" href="../static/style/all_customers.css">
+        <link rel="stylesheet" href="../static/style/all_shows.css">
         <script src="../static/js/lib.js" type="text/javascript"></script>
-        <script src="../static/js/all_customers.js" type="text/javascript"></script>
+        <script src="../static/js/all_shows.js" type="text/javascript"></script>
     </head>
     <body>
         <div class="navbar">
             <a href="/main" class="navbar-title">TVOnDemand</a>
         </div>
         <div class="side-navbar">
-            <a class="tab-btn tab-btn-active" id="all-customers-tab" href="/customers">Customers</a>
-            <a class="tab-btn" id="all-shows-tab" href="/shows">Shows</a>
-            <a class="tab-btn" id="all-films-tab" href="/films">Films</a>
+            <a class="tab-btn" id="all-customers-tab" href="/customers">Customers</a>
+            <a class="tab-btn tab-btn-active" id="all-shows-tab" href="/shows">Shows</a>
+            <a class="tab-btn" id="all-filmls-tab" href="/films">Films</a>
             {% if user_type == "Employee" %}
             {% elif sub_type == "Administrator" %}
             {% endif %}
