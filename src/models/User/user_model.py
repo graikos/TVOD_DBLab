@@ -144,14 +144,14 @@ class User(abc.ABC):
 
         cur = dbconn.cursor()
         cur.execute(f"INSERT INTO {table}(first_name,last_name,email,address_id,pass_hash,pass_salt) VALUES (%s,%s,%s,%s,%s,%s)", (first_name, last_name, email, address_id, pass_hash, salt))
-        cur.commit()
+        dbconn.commit()
         cur.close()
 
     @staticmethod
     def delete_user(table, email):
         cur = dbconn.cursor()
         cur.execute(f"DELETE FROM {table} WHERE email=%s", (email,))
-        cur.commit()
+        dbconn.commit()
         cur.close()
 
     @staticmethod
@@ -167,7 +167,7 @@ class User(abc.ABC):
 
         cur.execute(f"DELETE FROM {from_table} WHERE email=%s", (email,))
         cur.execute(f"INSERT INTO {to_table} (first_name, last_name, email, address_id, active, create_date, pass_hash, pass_salt) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (*data,))
-        cur.commit()
+        dbconn.commit()
         cur.close()
 
 

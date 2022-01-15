@@ -178,6 +178,7 @@ body {
     margin:0;
     right:100px;
     bottom: 100px;
+    z-index: +99999;
 }
 
 .loader-visible {
@@ -339,14 +340,15 @@ body {
     width: 90%;
     left: 5%;
     border-radius: 3px;
-    overflow: hidden;
     border-collapse: collapse;
+    overflow-y: visible;
     text-align: center;
     opacity: 0;
-    margin-bottom: 150px;
+    margin-bottom: 100px;
     animation: tableenter .25s;
     animation-fill-mode: forwards;
 }
+
 
 .scrollable-table {
     display: block;
@@ -407,10 +409,14 @@ body {
     color: #AD1457;
 }
 
+
 .data-table tr:nth-child(odd) {
   background-color: #2b2b2b;
 }
 
+.data-table tr:first-child {
+    background-color: blue;
+}
 
 
 .edit-row-input {

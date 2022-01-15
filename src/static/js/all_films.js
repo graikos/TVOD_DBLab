@@ -1,4 +1,3 @@
-
 let hostname = window.location.href.split("/");
 hostname = hostname.slice(0, hostname.length-1).join("/");
 
@@ -21,7 +20,7 @@ let activeAdd = false;
 const ratings = ["G","PG","PG-13","R","NC-17"];
 
 window.onload = () => {
-    fetchShows();
+    fetchFilms();
     document.getElementById("log-out").addEventListener('click', () => {
         deleteAllCookies();
         window.location.href="/login";
@@ -32,26 +31,28 @@ window.onload = () => {
             return;
         }
         activeAdd = true;
-        let table = tables["shows_table"];
-        let newrow = table.appendRow(["", "", "", "", "", "", ""]);
-        table.editHTMLRow([undefined, "text", "text", "select", "text", "text", "text"], newrow, saveNewShow, [{"options": ratings}], () => {
+        let table = tables["films_table"];
+        let newrow = table.appendRow(["", "", "", "", "", "", "", "", ""]);
+        table.editHTMLRow([undefined, "text", "text", "select", "text", "text", "text", "text", "text"], newrow, saveNewFilm, [{"options": ratings}], () => {
             newrow.remove();
             activeAdd = false;
         }, true);
     });
 };
 
-const saveNewShow = (e, values) => {
+
+const saveNewFilm = (e, values) => {
     activeAdd = false;
 
-    tables["shows_table"].rows[tables["shows_table"].rows.length - 1] = values;
+    tables["films_table"].rows[tables["films_table"].rows.length - 1] = values;
 
     let data = `{
-        "type": "SHOW",
+        "type": "FILM",
         "action": "ADD",
         "title": "${values[1]}",
         "description": "${values[2]}",
-        "release_year": ${parseInt(values[6])},
+        "length": ${parseInt(values[6])},
+        "release_year": ${parseInt(values[7])},
         "language": "${values[4]}",
         "original_language": "${values[5]}",
         "rating": "${values[3]}",
@@ -75,14 +76,14 @@ const saveNewShow = (e, values) => {
         if (req.readyState == 4) {
             disableLoader();
             if (req.status == 200) {
-                makeToast("success", "Successfully added show", 1000);
-                let tab = tables["shows_table"];
+                makeToast("success", "Successfully added film", 1000);
+                let tab = tables["films_table"];
                 tab.tableRoot.remove();
                 start = 0;
-                fetchShows(true, true);
+                fetchFilms(true, true);
                 tab.activeClose = false;
             } else {
-                makeToast("failure", "Error adding show", 1000);
+                makeToast("failure", "Error adding film", 1000);
             }
         }
     };
@@ -90,7 +91,7 @@ const saveNewShow = (e, values) => {
 };
 
 
-const fetchShows = (checkPoint, refreshTable) => {
+const fetchFilms = (checkPoint, refreshTable) => {
     let token = getCookie("sessid");
     
     let req = new XMLHttpRequest();
@@ -99,7 +100,7 @@ const fetchShows = (checkPoint, refreshTable) => {
     if (checkPoint) {
         itemnum = haveLoaded;
     }
-    let params = "?start="+start+"&end="+itemnum+"&type=ALL_SHOWS";
+    let params = "?start="+start+"&end="+itemnum+"&type=ALL_FILMS";
 
     url = encodeURI(url+params);
 
@@ -113,18 +114,18 @@ const fetchShows = (checkPoint, refreshTable) => {
             if (req.status == 200) {
                 resp = JSON.parse(req.response);
                 haveLoaded += resp.length;
-                if (tables["shows_table"] === undefined || refreshTable) {
+                if (tables["films_table"] === undefined || refreshTable) {
                     if (refreshTable) {
                         haveLoaded = resp.length;
                     }
-                    createShowsTable(resp);
+                    createFilmsTable(resp);
                 } else {
                     if (resp.length < batch) {
                         document.getElementById("load-more-btn").remove();
                     }
-                    resp.forEach(show => {
-                        tables["shows_table"].appendRow([show["show_id"], show["title"], show["description"],  
-                        show["rating"], show["language"].join(", "), show["original_language"].join(", "), show["release_year"]]);
+                    resp.forEach(film => {
+                        tables["films_table"].appendRow([film["film_id"], film["title"], film["description"],  
+                        film["rating"], joinelem(film["language"]), joinelem(film["original_language"]), film["release_year"]]);
                     });
                 }
                 start += batch;
@@ -134,28 +135,29 @@ const fetchShows = (checkPoint, refreshTable) => {
         }
     }
 };
-const createShowsTable = (showData) => {
-    if (showData.length == 0) {
+const createFilmsTable = (filmsData) => {
+    if (filmsData.length == 0) {
         let nosh = document.createElement("h2");
         nosh.classList.add("no-entries-text");
         nosh.innerHTML = `No shows found`;
         document.getElementsByClassName["main-content"][0].appendChild(nosh);
     }
-    let table = new TableCreator(document.getElementsByClassName("main-content")[0], ["ID", "Title", "Description", "Rating",
-     "Language", "Original Language", "Release Year"],
-     [], 0, showsActions);
-     showData.forEach(show => {
-        table.addInternalRow([show["show_id"], show["title"], show["description"],  
-        show["rating"], show["language"].join(", "), show["original_language"].join(", "), show["release_year"]]);
+    let table = new TableCreator(document.getElementsByClassName("main-content")[0], ["ID", "Title", "Description",
+     "Rating", "Language", "Original Language", "Length", "Release Year", "Special Features"],
+     [], 0, filmsActions);
+     filmsData.forEach(film => {
+
+        table.addInternalRow([film["film_id"], film["title"], film["description"],  
+        film["rating"], joinelem(film["language"]), joinelem(film["original_language"]), film["length"], film["release_year"], film["special_features"]]);
      });
-     table.createTable(true, fetchShows, true);
-     tables["shows_table"] = table;
+     table.createTable(true, fetchFilms, true);
+     tables["films_table"] = table;
 };
 
 
-const editShow = (e) => {
+const editFilm = (e) => {
     let currentRow = e.target.parentNode.parentNode;
-    tables["shows_table"].editHTMLRow([undefined, "text", "text", "select", "text", "text", "text"], currentRow, confirmEditShow, [
+    tables["films_table"].editHTMLRow([undefined, "text", "text", "select", "text", "text", "text", "text", "text"], currentRow, confirmEditFilm, [
         {
             "options": ratings
         }
@@ -163,22 +165,22 @@ const editShow = (e) => {
 };
 
 
+const confirmEditFilm = (e, values) => {
 
-const confirmEditShow = (e, values) => {
-
-    let show_id = parseInt(e.target.getAttribute("data-row-id"));
+    let film_id = parseInt(e.target.getAttribute("data-row-id"));
 
     let data = `{
-        "type": "SHOW",
+        "type": "FILM",
         "action": "UPDATE",
-        "show_id": ${show_id},
+        "film_id": ${film_id},
         "title": "${values[1]}",
         "description": "${values[2]}",
-        "release_year": ${parseInt(values[6])},
+        "release_year": ${parseInt(values[7])},
+        "length": ${parseInt(values[6])},
         "language": "${values[4]}",
         "original_language": "${values[5]}",
         "rating": "${values[3]}",
-        "special_features": ""
+        "special_features": "${values[8]}"
     }`;
 
     let token = getCookie("sessid");
@@ -198,30 +200,30 @@ const confirmEditShow = (e, values) => {
         if (req.readyState == 4) {
             disableLoader();
             if (req.status == 200) {
-                makeToast("success", "Successfully updated show", 1000);
-                let tab = tables["shows_table"];
+                makeToast("success", "Successfully updated film", 1000);
+                let tab = tables["films_table"];
                 tab.replaceHTMLRow(values, e.target.parentNode.parentNode);
                 tab.replaceActionsInHTMLRow(tab.actions, e.target.parentNode.parentNode);
                 tab.activeClose = false;
             } else {
-                makeToast("failure", "Error updating show", 1000);
+                makeToast("failure", "Error updating film", 1000);
             }
         }
     };
 };
 
-const removeShow = (e) => {
+const removeFilm = (e) => {
     let currentRow = e.target.parentNode.parentNode;
-    tables["shows_table"].editHTMLRow([], currentRow, confirmRemoveShow);
+    tables["films_table"].editHTMLRow([], currentRow, confirmRemoveFilm);
 }
 
-const confirmRemoveShow = (e, values) => {
-    let show_id = parseInt(e.target.getAttribute("data-row-id"));
+const confirmRemoveFilm = (e, values) => {
+    let film_id = parseInt(e.target.getAttribute("data-row-id"));
 
     let data = {
-        "type": "SHOW",
+        "type": "FILM",
         "action": "DELETE",
-        "show_id": show_id
+        "film_id": film_id
     };
     data = JSON.stringify(data);
 
@@ -242,14 +244,14 @@ const confirmRemoveShow = (e, values) => {
         if (req.readyState == 4) {
             disableLoader();
             if (req.status == 200) {
-                makeToast("success", "Successfully removed show", 1000);
-                let tab = tables["shows_table"];
+                makeToast("success", "Successfully removed film", 1000);
+                let tab = tables["films_table"];
                 tab.tableRoot.remove();
                 start = 0;
-                fetchShows(true, true);
+                fetchFilms(true, true);
                 tab.activeClose = false;
             } else {
-                makeToast("failure", "Error removing show", 1000);
+                makeToast("failure", "Error removing film", 1000);
             }
         }
     };
@@ -261,18 +263,15 @@ const confirmRemoveShow = (e, values) => {
 
 
 
-
-
-
-const showActors = (e, noPop, show_id) => {
+const showActors = (e, noPop, film_id) => {
     let token = getCookie("sessid");
     
     let req = new XMLHttpRequest();
     let url = hostname+fetchEndpoint;
-    if (show_id === undefined) {
-        show_id = e.target.getAttribute("data-row-id")
+    if (film_id === undefined) {
+        film_id = e.target.getAttribute("data-row-id")
     }
-    let params = "?type=ACTORS_BY_SHOW_ID&show_id="+show_id;
+    let params = "?type=ACTORS_BY_FILM_ID&film_id="+film_id;
     url = encodeURI(url+params);
     req.open("get", url);
     req.setRequestHeader("Authorization", token);
@@ -287,7 +286,7 @@ const showActors = (e, noPop, show_id) => {
             if (req.status == 200) {
                 resp = JSON.parse(req.response);
                 if (!noPop) {
-                    let ppp = createPopUp(document.body, `Actors for: ${title}`, tables, "actors_table", show_id);
+                    let ppp = createPopUp(document.body, `Actors for: ${title}`, tables, "actors_table", film_id);
                     addFloatingButton(ppp, "add", addActor, "actor");
                 }
                 createActorsTable(resp);
@@ -302,15 +301,15 @@ const saveNewActor = (e, values) => {
     var fl = document.querySelector('[data-source="actor"]');
     fl.setAttribute("data-active", "0");
 
-    let show_id = parseInt(document.getElementsByClassName("popup")[0].getAttribute("data-for-id"));
+    let film_id = parseInt(document.getElementsByClassName("popup")[0].getAttribute("data-for-id"));
 
     let actor_id = parseInt(e.target.getAttribute("data-row-id"));
 
     tables["actors_table"].rows[tables["actors_table"].rows.length - 1] = values;
     let data = {
-        "type": "SHOW",
+        "type": "FILM",
         "action": "ADD_ACTOR",
-        "show_id": show_id,
+        "film_id": film_id,
         "first_name": values[1],
         "last_name": values[2]
     };
@@ -336,7 +335,7 @@ const saveNewActor = (e, values) => {
                 makeToast("success", "Successfully updated actors", 1000);
                 let tab = tables["actors_table"];
                 tab.tableRoot.remove();
-                showActors(e, true, show_id);
+                showActors(e, true, film_id);
                 tab.activeClose = false;
             } else {
                 makeToast("failure", "Error updating actors", 1000);
@@ -352,13 +351,13 @@ const removeActor = (e) => {
 }
 
 const confirmRemoveActor = (e, values) => {
-    let show_id = parseInt(document.getElementsByClassName("popup")[0].getAttribute("data-for-id"));
+    let film_id = parseInt(document.getElementsByClassName("popup")[0].getAttribute("data-for-id"));
     let actor_id = parseInt(e.target.getAttribute("data-row-id"));
 
     let data = {
-        "type": "SHOW",
+        "type": "FILM",
         "action": "DELETE_ACTOR",
-        "show_id": show_id,
+        "film_id": film_id,
         "actor_id": actor_id
     };
     data = JSON.stringify(data);
@@ -383,7 +382,7 @@ const confirmRemoveActor = (e, values) => {
                 makeToast("success", "Successfully updated actors", 1000);
                 let tab = tables["actors_table"];
                 tab.tableRoot.remove();
-                showActors(e, true, show_id);
+                showActors(e, true, film_id);
                 tab.activeClose = false;
             } else {
                 makeToast("failure", "Error updating actors", 1000);
@@ -434,15 +433,17 @@ const createActorsTable = (actorsData, allowEmpty) => {
 
 
 
-const showCategories = (e, noPop, show_id) => {
+
+
+const showCategories = (e, noPop, film_id) => {
     let token = getCookie("sessid");
     
     let req = new XMLHttpRequest();
     let url = hostname+fetchEndpoint;
-    if (show_id === undefined) {
-        show_id = e.target.getAttribute("data-row-id");
+    if (film_id === undefined) {
+        film_id = e.target.getAttribute("data-row-id");
     }
-    let params = "?type=CATEGORIES_BY_SHOW_ID&show_id="+show_id;
+    let params = "?type=CATEGORIES_BY_FILM_ID&film_id="+film_id;
     url = encodeURI(url+params);
     req.open("get", url);
     req.setRequestHeader("Authorization", token);
@@ -457,7 +458,7 @@ const showCategories = (e, noPop, show_id) => {
             if (req.status == 200) {
                 resp = JSON.parse(req.response);
                 if (!noPop) {
-                    let ppp = createPopUp(document.body, `Categories for: ${title}`, tables, "categories_table", show_id);
+                    let ppp = createPopUp(document.body, `Categories for: ${title}`, tables, "categories_table", film_id);
                     addFloatingButton(ppp, "add", addCategory, "category");
                 }
                 createCategoriesTable(resp);
@@ -473,15 +474,15 @@ const saveNewCategory = (e, values) => {
     var fl = document.querySelector('[data-source="category"]');
     fl.setAttribute("data-active", "0");
 
-    let show_id = parseInt(document.getElementsByClassName("popup")[0].getAttribute("data-for-id"));
+    let film_id = parseInt(document.getElementsByClassName("popup")[0].getAttribute("data-for-id"));
 
     let cat_id = parseInt(e.target.getAttribute("data-row-id"));
 
     tables["categories_table"].rows[tables["categories_table"].rows.length - 1] = values;
     let data = {
-        "type": "SHOW",
+        "type": "FILM",
         "action": "ADD_CATEGORY",
-        "show_id": show_id,
+        "film_id": film_id,
         "name": values[1]
     };
     data = JSON.stringify(data);
@@ -506,7 +507,7 @@ const saveNewCategory = (e, values) => {
                 makeToast("success", "Successfully updated categories", 1000);
                 let tab = tables["categories_table"];
                 tab.tableRoot.remove();
-                showCategories(e, true, show_id);
+                showCategories(e, true, film_id);
                 tab.activeClose = false;
             } else {
                 makeToast("failure", "Error updating categories", 1000);
@@ -559,13 +560,13 @@ const removeCategory = (e) => {
 }
 
 const confirmRemoveCategory = (e, values) => {
-    let show_id = parseInt(document.getElementsByClassName("popup")[0].getAttribute("data-for-id"));
+    let film_id = parseInt(document.getElementsByClassName("popup")[0].getAttribute("data-for-id"));
     let actor_id = parseInt(e.target.getAttribute("data-row-id"));
 
     let data = {
-        "type": "SHOW",
+        "type": "FILM",
         "action": "DELETE_CATEGORY",
-        "show_id": show_id,
+        "film_id": film_id,
         "category_id": parseInt(values[0])
     };
     data = JSON.stringify(data);
@@ -590,7 +591,7 @@ const confirmRemoveCategory = (e, values) => {
                 makeToast("success", "Successfully updated categories", 1000);
                 let tab = tables["categories_table"];
                 tab.tableRoot.remove();
-                showCategories(e, true, show_id);
+                showCategories(e, true, film_id);
                 tab.activeClose = false;
             } else {
                 makeToast("failure", "Error updating categories", 1000);
@@ -606,224 +607,6 @@ const confirmRemoveCategory = (e, values) => {
 
 
 
-const showSeasons = (e, noPop, show_id) => {
-    let token = getCookie("sessid");
-    
-    let req = new XMLHttpRequest();
-    let url = hostname+fetchEndpoint;
-    if (show_id === undefined) {
-        show_id = e.target.getAttribute("data-row-id");
-    }
-    let params = "?type=SEASONS_BY_SHOW_ID&show_id="+show_id;
-    url = encodeURI(url+params);
-    req.open("get", url);
-    req.setRequestHeader("Authorization", token);
-    req.send();
-
-    let title = e.target.parentNode.parentNode.children[1].innerHTML;
-
-    enableLoader();
-    req.onreadystatechange = () => {
-        if (req.readyState == 4) {
-            disableLoader();
-            if (req.status == 200) {
-                resp = JSON.parse(req.response);
-                if (!noPop) {
-                    let ppp = createPopUp(document.body, `Seasons for: ${title}`, tables, "seasons_table", show_id);
-                    addFloatingButton(ppp, "add", addSeason, "season");
-                }
-                createSeasonsTable(resp);
-            } else {
-                makeToast("failure", "Error fetching seasons data", 1000);
-            }
-        }
-    };
-};
-
-const saveNewSeason = (e, values) => {
-    var fl = document.querySelector('[data-source="season"]');
-    fl.setAttribute("data-active", "0");
-
-    let show_id = parseInt(document.getElementsByClassName("popup")[0].getAttribute("data-for-id"));
-
-    let season_id = parseInt(e.target.getAttribute("data-row-id"));
-
-    tables["seasons_table"].rows[tables["seasons_table"].rows.length - 1] = values;
-    let data = {
-        "type": "SHOW",
-        "action": "ADD_SEASON",
-        "show_id": show_id,
-        "episodes": parseInt(values[2])
-    };
-    data = JSON.stringify(data);
-
-    let token = getCookie("sessid");
-    
-    let req = new XMLHttpRequest();
-    let url = hostname+editEndpoint;
-
-    url = encodeURI(url);
-    req.open("put", url);
-    req.setRequestHeader("Content-Type", "application/json");
-    req.setRequestHeader("Authorization", token);
-    req.send(data);
-
-
-    enableLoader();
-    req.onreadystatechange = () => {
-        if (req.readyState == 4) {
-            disableLoader();
-            if (req.status == 200) {
-                makeToast("success", "Successfully updated seasons", 1000);
-                let tab = tables["seasons_table"];
-                tab.tableRoot.remove();
-                showSeasons(e, true, show_id);
-                tab.activeClose = false;
-            } else {
-                makeToast("failure", "Error updating seasons", 1000);
-            }
-        }
-    };
-
-};
-
-const addSeason = (e) => {
-    if (e.target.parentNode.getAttribute("data-active") == "1") {
-        return;
-    }
-    e.target.parentNode.setAttribute("data-active", "1");
-    let table = tables["seasons_table"];
-    let noentries = document.getElementsByClassName("no-entries-text")[0];
-    if (table === undefined || noentries !== undefined) {
-        createSeasonsTable([], true);
-        table = tables["seasons_table"];
-        noentries.remove();
-    }
-    let lastseason = table.getLastRow();
-    let lastno = 0;
-    if (lastseason !== undefined) {
-        lastno = parseInt(lastseason[1]);
-    }
-    let newrow = table.appendRow(["", lastno+1, ""]);
-    table.editHTMLRow([undefined, undefined, "text"], newrow, saveNewSeason, undefined, () => {
-        newrow.remove();
-        e.target.parentNode.setAttribute("data-active", "0");
-    }, true);
-}
-
-const createSeasonsTable = (seasonData, allowEmpty) => {
-    if (seasonData.length == 0 && !allowEmpty) {
-        let seasonData = document.createElement("h2");
-        seasonData.classList.add("no-entries-text");
-        seasonData.innerHTML = `No seasons found`;
-        document.getElementsByClassName("popup")[0].appendChild(seasonData);
-        return;
-    }
-
-    let table = new TableCreator(document.getElementsByClassName("popup")[0], ["ID", "Season Number", "No. of Episodes"], [], 0, seasonsActions);
-
-    seasonData.forEach(s => {
-       table.addInternalRow([s["season_id"], s["season_number"], s["episodes"]]);
-    });
-    table.createTable(false);
-    tables["seasons_table"] = table;
-};
-
-const removeSeason = (e) => {
-    let currentRow = e.target.parentNode.parentNode;
-    tables["seasons_table"].editHTMLRow([], currentRow, confirmRemoveSeason);
-}
-
-const confirmRemoveSeason = (e, values) => {
-    let show_id = parseInt(document.getElementsByClassName("popup")[0].getAttribute("data-for-id"));
-    let actor_id = parseInt(e.target.getAttribute("data-row-id"));
-
-    let data = {
-        "type": "SHOW",
-        "action": "DELETE_SEASON",
-        "show_id": show_id,
-        "season_id": parseInt(values[0])
-    };
-    data = JSON.stringify(data);
-
-    let token = getCookie("sessid");
-    
-    let req = new XMLHttpRequest();
-    let url = hostname+editEndpoint;
-
-    url = encodeURI(url);
-    req.open("put", url);
-    req.setRequestHeader("Content-Type", "application/json");
-    req.setRequestHeader("Authorization", token);
-    req.send(data);
-
-
-    enableLoader();
-    req.onreadystatechange = () => {
-        if (req.readyState == 4) {
-            disableLoader();
-            if (req.status == 200) {
-                makeToast("success", "Successfully updated seasons", 1000);
-                let tab = tables["seasons_table"];
-                tab.tableRoot.remove();
-                showSeasons(e, true, show_id);
-                tab.activeClose = false;
-            } else {
-                makeToast("failure", "Error updating seasons", 1000);
-            }
-        }
-    };
-
-};
-
-
-
-const editSeason = (e) => {
-    let currentRow = e.target.parentNode.parentNode;
-    tables["seasons_table"].editHTMLRow([undefined, undefined, "text"], currentRow, confirmEditSeason);
-};
-
-
-
-const confirmEditSeason = (e, values) => {
-
-    let season_id = parseInt(e.target.getAttribute("data-row-id"));
-
-    let data = `{
-        "type": "SHOW",
-        "action": "UPDATE_SEASON",
-        "season_id": ${season_id},
-        "episodes": ${parseInt(values[2])}
-    }`;
-
-    let token = getCookie("sessid");
-    
-    let req = new XMLHttpRequest();
-    let url = hostname+editEndpoint;
-
-    url = encodeURI(url);
-    req.open("put", url);
-    req.setRequestHeader("Content-Type", "application/json");
-    req.setRequestHeader("Authorization", token);
-    req.send(data);
-
-
-    enableLoader();
-    req.onreadystatechange = () => {
-        if (req.readyState == 4) {
-            disableLoader();
-            if (req.status == 200) {
-                makeToast("success", "Successfully updated season", 1000);
-                let tab = tables["seasons_table"];
-                tab.replaceHTMLRow(values, e.target.parentNode.parentNode);
-                tab.replaceActionsInHTMLRow(tab.actions, e.target.parentNode.parentNode);
-                tab.activeClose = false;
-            } else {
-                makeToast("failure", "Error updating season", 1000);
-            }
-        }
-    };
-};
 
 
 
@@ -831,29 +614,25 @@ const confirmEditSeason = (e, values) => {
 
 
 
-
-let showsActions = {
+let filmsActions = {
     "edit": {
-        "func": editShow,
+        "func": editFilm,
         "desc": "Edit"
     },
     "people": {
         "func": showActors,
         "desc": "Show Actors"
     },
-    "movie_creation": {
-        "func": showSeasons,
-        "desc": "Show Seasons"
-    },
     "subject": {
         "func": showCategories,
         "desc": "Show Categories"
     },
     "delete": {
-        "func": removeShow,
-        "desc": "Remove Show"
+        "func": removeFilm,
+        "desc": "Remove Film"
     }
 };
+
 
 let actorActions = {
     "delete": {
@@ -869,14 +648,10 @@ let categoriesActions = {
     }
 };
 
-
-let seasonsActions = {
-    "edit": {
-        "func": editSeason,
-        "desc": "Edit Season"
-    },
-    "delete": {
-        "func": removeSeason,
-        "desc": "Remove Season"
+const joinelem = (elem) => {
+    if (elem === null) {
+        return null;
+    } else {
+        return elem.join(", ");
     }
-};
+}

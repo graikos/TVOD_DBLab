@@ -38,7 +38,7 @@ class Show:
         shows = []
 
         cur = dbconn.cursor()
-        cur.execute("SELECT * FROM tv_show INNER JOIN inventory ON tv_show.show_id=inventory.show_id ORDER BY tv_show.show_id ASC LIMIT %s, %s", (start, end))
+        cur.execute("SELECT * FROM tv_show INNER JOIN inventory ON tv_show.show_id=inventory.show_id ORDER BY tv_show.title ASC LIMIT %s, %s", (start, end))
         show_tuples = cur.fetchall()
         for show in show_tuples:
             cur.execute("SELECT name FROM category INNER JOIN tv_show_category ON category.category_id=tv_show_category.category_id WHERE tv_show_category.show_id=%s", (show[0],))
@@ -73,7 +73,7 @@ class Show:
     @staticmethod
     def get_all_shows(start, end):
         cur = dbconn.cursor()
-        cur.execute("SELECT * FROM tv_show LIMIT %s,%s", (start, end))
+        cur.execute("SELECT * FROM tv_show ORDER BY title ASC LIMIT %s,%s", (start, end))
         res = cur.fetchall()
 
         shows = []
@@ -108,27 +108,26 @@ class Show:
         return shows
 
     @staticmethod
-    def add_show(title, description, release_year, language, original_language, length, rating, special_features):
+    def add_show(title, description, release_year, language, original_language, rating, special_features):
         cur = dbconn.cursor()
 
         language_id = Language.add_language(language)
         original_language_id = Language.add_language(original_language)
 
-        cur.execute("INSERT INTO tv_show(title, description, release_year, language_id, original_language_id, length, rating, special_features) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (title, description, release_year, language_id, original_language_id, length, rating, special_features))
-        cur.execute("SELECT LAST_INSERT_ID()")
+        cur.execute("INSERT INTO tv_show(title, description, release_year, language_id, original_language_id, rating, special_features) VALUES (%s, %s, %s, %s, %s, %s, %s)", (title, description, release_year, language_id, original_language_id, rating, special_features))
 
-        cur.commit()
+        dbconn.commit()
         cur.close()
 
     @staticmethod
-    def update_show(show_id, title, description, release_year, language, original_language, length, rating, special_features):
+    def update_show(show_id, title, description, release_year, language, original_language, rating, special_features):
         cur = dbconn.cursor()
 
         language_id = Language.add_language(language)
         original_language_id = Language.add_language(original_language)
 
-        cur.execute("UPDATE tv_show SET title=%s,description=%s,release_year=%s,language_id=%s,original_language_id=%s,length=%s,rating=%s,special_features=%s WHERE show_id=%s", (title, description, release_year, language_id, original_language_id, length, rating, special_features, show_id))
-        cur.commit()
+        cur.execute("UPDATE tv_show SET title=%s,description=%s,release_year=%s,language_id=%s,original_language_id=%s,rating=%s,special_features=%s WHERE show_id=%s", (title, description, release_year, language_id, original_language_id, rating, special_features, show_id))
+        dbconn.commit()
         cur.close()
 
     @staticmethod
@@ -141,8 +140,30 @@ class Show:
 
         cur = dbconn.cursor()
         cur.execute("DELETE FROM tv_show_actor WHERE show_id=%s", (show_id,))
-        cur.execute(actor_query, get_value_tuple(actor_query_vals))
-        cur.commit()
+        if actor_query:
+            cur.execute(actor_query, get_value_tuple(actor_query_vals))
+        dbconn.commit()
+        cur.close()
+
+    @staticmethod
+    def add_show_actor(show_id, first_name, last_name):
+        actor_id = Actor.add_actor(first_name, last_name)
+
+        cur = dbconn.cursor()
+        cur.execute("SELECT * FROM tv_show_actor WHERE show_id=%s AND actor_id=%s", (show_id, actor_id))
+        res = cur.fetchall()
+
+        if not res:
+            cur.execute("INSERT INTO tv_show_actor VALUES (%s, %s)", (actor_id, show_id))
+            dbconn.commit()
+
+        cur.close()
+
+    @staticmethod
+    def delete_show_actor(show_id, actor_id):
+        cur = dbconn.cursor()
+        cur.execute("DELETE FROM tv_show_actor WHERE show_id=%s AND actor_id=%s", (show_id, actor_id))
+        dbconn.commit()
         cur.close()
 
     @staticmethod
@@ -155,28 +176,97 @@ class Show:
 
         cur = dbconn.cursor()
         cur.execute("DELETE FROM tv_show_category WHERE show_id=%s", (show_id,))
-        cur.execute(category_query, get_value_tuple(category_query_vals))
-        cur.commit()
+        if category_query:
+            cur.execute(category_query, get_value_tuple(category_query_vals))
+        dbconn.commit()
+        cur.close()
+
+    @staticmethod
+    def add_show_category(show_id, name):
+        category_id = Category.add_category(name)
+
+        cur = dbconn.cursor()
+        cur.execute("SELECT * FROM tv_show_category WHERE show_id=%s AND category_id=%s", (show_id, category_id))
+        res = cur.fetchall()
+
+        if not res:
+            cur.execute("INSERT INTO tv_show_category VALUES (%s, %s)", (show_id, category_id))
+            dbconn.commit()
+
+        cur.close()
+
+    @staticmethod
+    def delete_show_category(show_id, category_id):
+        cur = dbconn.cursor()
+        cur.execute("DELETE FROM tv_show_category WHERE show_id=%s AND category_id=%s", (show_id, category_id))
+        dbconn.commit()
         cur.close()
 
     @staticmethod
     def update_show_seasons(show_id, seasons):
-        # seasons: dict of form {season_number: episodes}
+        # seasons: list, where seasons[i] = j means season i has j episodes
         season_query_vals = []
-        for season in seasons:
-            season_query_vals.append((show_id, season, seasons[season]))
+        for season, episodes in enumerate(seasons):
+            season_query_vals.append((show_id, season+1, episodes))
 
         season_query = pack_values_into_sql_insert("season", len(season_query_vals), 3, table_cols=("show_id", "season_number", "episodes"))
 
         cur = dbconn.cursor()
         cur.execute("DELETE FROM season WHERE show_id=%s", (show_id,))
-        cur.execute(season_query, get_value_tuple(season_query_vals))
-        cur.commit()
+        if season_query:
+            cur.execute(season_query, get_value_tuple(season_query_vals))
+        dbconn.commit()
+        cur.close()
+
+    @staticmethod
+    def add_show_season(show_id, episodes):
+        cur = dbconn.cursor()
+        cur.execute("SELECT MAX(season_number) FROM season WHERE show_id=%s", (show_id,))
+        res = cur.fetchall()
+
+        if not res[0][0]:
+            season_number = 1
+        else:
+            season_number = res[0][0] + 1
+
+        cur.execute("INSERT INTO season(show_id, season_number, episodes) VALUES (%s, %s, %s)", (show_id, season_number, episodes))
+        dbconn.commit()
+
+        cur.close()
+
+    @staticmethod
+    def update_show_season(season_id, episodes):
+        cur = dbconn.cursor()
+        cur.execute("UPDATE season SET episodes=%s WHERE season_id=%s", (episodes, season_id))
+        dbconn.commit()
+        cur.close()
+
+    @staticmethod
+    def delete_show_season(show_id, season_id):
+        cur = dbconn.cursor()
+        cur.execute("SELECT season_id,season_number FROM season WHERE show_id=%s ORDER BY season_number ASC", (show_id,))
+        all_seasons = cur.fetchall()
+
+        if not all_seasons:
+            raise ValueError
+
+        found_season_to_delete = False
+        for season in all_seasons:
+            if found_season_to_delete:
+                cur.execute("UPDATE season SET season_number=%s WHERE season_id=%s", (season[1] - 1, season[0]))
+                continue
+                
+            if season[0] == season_id:
+                found_season_to_delete = True
+
+
+        cur.execute("DELETE FROM season WHERE season_id=%s", (season_id,))
+        dbconn.commit()
         cur.close()
 
     @staticmethod
     def delete_show(show_id):
         cur = dbconn.cursor()
         cur.execute("DELETE FROM tv_show WHERE show_id=%s", (show_id,))
-        cur.commit()
+        dbconn.commit()
         cur.close()

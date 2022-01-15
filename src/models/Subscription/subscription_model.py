@@ -34,7 +34,7 @@ class Subscription:
 
         cur = dbconn.cursor()
         cur.execute(query, tuple(args))
-        cur.commit()
+        dbconn.commit()
         cur.close()
 
             

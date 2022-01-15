@@ -70,7 +70,7 @@ CREATE TABLE city (
   city VARCHAR(50) NOT NULL,
   country_id SMALLINT UNSIGNED NOT NULL,
   PRIMARY KEY  (city_id),
-  CONSTRAINT `fk_city_country` FOREIGN KEY (country_id) REFERENCES country (country_id) ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT `fk_city_country` FOREIGN KEY (country_id) REFERENCES country (country_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -87,7 +87,7 @@ CREATE TABLE address (
   postal_code VARCHAR(10) DEFAULT NULL,
   phone VARCHAR(20) NOT NULL,
   PRIMARY KEY  (address_id),
-  CONSTRAINT `fk_address_city` FOREIGN KEY (city_id) REFERENCES city (city_id) ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT `fk_address_city` FOREIGN KEY (city_id) REFERENCES city (city_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -135,8 +135,8 @@ CREATE TABLE customer (
   pass_salt CHAR(8) NOT NULL,
   PRIMARY KEY (customer_id),
   UNIQUE (email),
-  CONSTRAINT fk_customer_address FOREIGN KEY (address_id) REFERENCES address (address_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT fk_subscription_type FOREIGN KEY (subscription_type) REFERENCES subscription(subscription_type) ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT fk_customer_address FOREIGN KEY (address_id) REFERENCES address (address_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_subscription_type FOREIGN KEY (subscription_type) REFERENCES subscription(subscription_type) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -155,7 +155,7 @@ CREATE TABLE employee (
   pass_salt CHAR(8) NOT NULL,
   PRIMARY KEY  (employee_id),
   UNIQUE (email),
-  CONSTRAINT fk_employee_address FOREIGN KEY (address_id) REFERENCES address (address_id) ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT fk_employee_address FOREIGN KEY (address_id) REFERENCES address (address_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -173,7 +173,7 @@ CREATE TABLE administrator (
   pass_salt CHAR(8) NOT NULL,
   PRIMARY KEY  (administrator_id),
   UNIQUE (email),
-  CONSTRAINT fk_administrator_address FOREIGN KEY (address_id) REFERENCES address (address_id) ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT fk_administrator_address FOREIGN KEY (address_id) REFERENCES address (address_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -190,8 +190,8 @@ CREATE TABLE film (
   rating ENUM('G','PG','PG-13','R','NC-17') DEFAULT 'G',
   special_features SET('Trailers','Commentaries','Deleted Scenes','Behind the Scenes') DEFAULT NULL,
   PRIMARY KEY  (film_id),
-  CONSTRAINT fk_film_language FOREIGN KEY (language_id) REFERENCES language (language_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT fk_film_language_original FOREIGN KEY (original_language_id) REFERENCES language (language_id) ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT fk_film_language FOREIGN KEY (language_id) REFERENCES language (language_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_film_language_original FOREIGN KEY (original_language_id) REFERENCES language (language_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -202,8 +202,8 @@ CREATE TABLE film_actor (
   actor_id SMALLINT UNSIGNED NOT NULL,
   film_id SMALLINT UNSIGNED NOT NULL,
   PRIMARY KEY  (actor_id,film_id),
-  CONSTRAINT fk_film_actor_actor FOREIGN KEY (actor_id) REFERENCES actor (actor_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT fk_film_actor_film FOREIGN KEY (film_id) REFERENCES film (film_id) ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT fk_film_actor_actor FOREIGN KEY (actor_id) REFERENCES actor (actor_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_film_actor_film FOREIGN KEY (film_id) REFERENCES film (film_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -214,8 +214,8 @@ CREATE TABLE film_category (
   film_id SMALLINT UNSIGNED NOT NULL,
   category_id TINYINT UNSIGNED NOT NULL,
   PRIMARY KEY (film_id, category_id),
-  CONSTRAINT fk_film_category_film FOREIGN KEY (film_id) REFERENCES film (film_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT fk_film_category_category FOREIGN KEY (category_id) REFERENCES category (category_id) ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT fk_film_category_film FOREIGN KEY (film_id) REFERENCES film (film_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_film_category_category FOREIGN KEY (category_id) REFERENCES category (category_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -229,8 +229,8 @@ CREATE TABLE tv_show (
   rating ENUM('G','PG','PG-13','R','NC-17') DEFAULT 'G',
   special_features SET('Trailers','Commentaries','Deleted Scenes','Behind the Scenes') DEFAULT NULL,
   PRIMARY KEY  (show_id),
-  CONSTRAINT fk_show_language FOREIGN KEY (language_id) REFERENCES language (language_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT fk_show_language_original FOREIGN KEY (original_language_id) REFERENCES language (language_id) ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT fk_show_language FOREIGN KEY (language_id) REFERENCES language (language_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_show_language_original FOREIGN KEY (original_language_id) REFERENCES language (language_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE season (
@@ -247,16 +247,16 @@ CREATE TABLE tv_show_actor (
   actor_id SMALLINT UNSIGNED NOT NULL,
   show_id INT UNSIGNED NOT NULL,
   PRIMARY KEY  (actor_id, show_id),
-  CONSTRAINT fk_show_actor_actor FOREIGN KEY (actor_id) REFERENCES actor (actor_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT fk_show_actor_show FOREIGN KEY (show_id) REFERENCES tv_show (show_id) ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT fk_show_actor_actor FOREIGN KEY (actor_id) REFERENCES actor (actor_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_show_actor_show FOREIGN KEY (show_id) REFERENCES tv_show (show_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE tv_show_category (
   show_id INT UNSIGNED NOT NULL,
   category_id TINYINT UNSIGNED NOT NULL,
   PRIMARY KEY (show_id, category_id),
-  CONSTRAINT fk_show_category_show FOREIGN KEY (show_id) REFERENCES tv_show (show_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT fk_show_category_category FOREIGN KEY (category_id) REFERENCES category (category_id) ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT fk_show_category_show FOREIGN KEY (show_id) REFERENCES tv_show (show_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_show_category_category FOREIGN KEY (category_id) REFERENCES category (category_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -270,8 +270,8 @@ CREATE TABLE inventory (
   show_id INT UNSIGNED DEFAULT NULL,
   item_type ENUM('FILM', 'SHOW') NOT NULL,
   PRIMARY KEY  (inventory_id),
-  CONSTRAINT fk_inventory_film FOREIGN KEY (film_id) REFERENCES film (film_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT fk_inventory_show FOREIGN KEY (show_id) REFERENCES tv_show(show_id) ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT fk_inventory_film FOREIGN KEY (film_id) REFERENCES film (film_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_inventory_show FOREIGN KEY (show_id) REFERENCES tv_show(show_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -287,9 +287,9 @@ CREATE TABLE rental (
   episode_number INT UNSIGNED DEFAULT NULL,
   customer_id SMALLINT UNSIGNED NOT NULL,
   PRIMARY KEY (rental_id),
-  CONSTRAINT fk_rental_inventory FOREIGN KEY (inventory_id) REFERENCES inventory (inventory_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT fk_rental_customer FOREIGN KEY (customer_id) REFERENCES customer (customer_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT fk_rental_season_id FOREIGN KEY (season_id) REFERENCES season(season_id) ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT fk_rental_inventory FOREIGN KEY (inventory_id) REFERENCES inventory (inventory_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_rental_customer FOREIGN KEY (customer_id) REFERENCES customer (customer_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_rental_season_id FOREIGN KEY (season_id) REFERENCES season(season_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -304,7 +304,7 @@ CREATE TABLE payment (
   payment_date DATETIME NOT NULL,
   PRIMARY KEY  (payment_id),
   CONSTRAINT fk_payment_rental FOREIGN KEY (rental_id) REFERENCES rental (rental_id) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT fk_payment_customer FOREIGN KEY (customer_id) REFERENCES customer (customer_id) ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT fk_payment_customer FOREIGN KEY (customer_id) REFERENCES customer (customer_id) ON DELETE CASCADE ON UPDATE CASCADE
  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 

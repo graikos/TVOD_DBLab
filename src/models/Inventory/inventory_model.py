@@ -32,27 +32,27 @@ class Inventory:
     def add_film(film_id):
         cur = dbconn.cursor()
         cur.execute("INSERT INTO inventory (film_id, item_type) VALUES (%s,'FILM')", (film_id,))
-        cur.commit()
+        dbconn.commit()
         cur.close()
 
     @staticmethod
     def add_show(show_id):
         cur = dbconn.cursor()
         cur.execute("INSERT INTO inventory (show_id, item_type) VALUES (%s,'SHOW')", (show_id,))
-        cur.commit()
+        dbconn.commit()
         cur.close()
 
     @staticmethod
     def remove_film(film_id):
         cur = dbconn.cursor()
         cur.execute("DELETE FROM inventory WHERE film_id=%s", (film_id,))
-        cur.commit()
+        dbconn.commit()
         cur.close()
 
     @staticmethod
     def remove_show(show_id):
         cur = dbconn.cursor()
         cur.execute("DELETE FROM inventory WHERE show_id=%s", (show_id,))
-        cur.commit()
+        dbconn.commit()
         cur.close()
         

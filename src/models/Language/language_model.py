@@ -36,7 +36,7 @@ class Language:
         cur.execute("INSERT INTO language (name) VALUES (%s)", (name,))
         cur.execute("SELECT LAST_INSERT_ID()")
         new_id = cur.fetchall()[0][0]
-        cur.commit()
+        dbconn.commit()
         cur.close()
 
         return new_id
@@ -45,5 +45,5 @@ class Language:
     def delete_language(language_id):
         cur = dbconn.cursor()
         cur.execute("DELETE FROM language WHERE language_id=%s", (language_id,))
-        cur.commit()
+        dbconn.commit()
         cur.close()

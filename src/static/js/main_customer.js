@@ -299,6 +299,24 @@ const rentDialog = (e) => {
         categoriesDetails.classList.add("hidden-details");
     }
 
+
+    let spdetails = document.getElementById("special-features-details");
+    if (entry_type == "FILMS") {
+        specialfeat = "";
+        currentData[entry_id].special_features.forEach(sp => {
+            specialfeat += (", " + sp);
+        });
+        if (specialfeat.length > 0) {
+            specialfeat = specialfeat.slice(2);
+            spdetails.classList.remove("hidden-details");
+            spdetails.innerHTML = `<span>Special Features: </span>` + specialfeat;
+        } else {
+            spdetails.classList.add("hidden-details");
+        }
+    } else {
+        spdetails.classList.add("hidden-details");
+    }
+
     let durationDetails = document.getElementById("duration-details");
     if (entry_type == "FILMS") {
         durationDetails.innerHTML = `<span>Duration: </span>` + currentData[entry_id]["length"] + "min";

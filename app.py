@@ -86,7 +86,7 @@ def all_customers():
     return render_template("all_customers.html", user_type=user_type)
 
 @app.route("/shows")
-def all_entries():
+def all_shows():
     user_type = ""
     try:
         token = request.cookies["sessid"]
@@ -105,6 +105,28 @@ def all_entries():
 
     
     return render_template("all_shows.html", user_type=user_type)
+
+
+@app.route("/films")
+def all_films():
+    user_type = ""
+    try:
+        token = request.cookies["sessid"]
+        user = tokens[token]
+        if isinstance(user,Employee):
+            user_type = "Employee"
+        elif isinstance(user, Administrator):
+            user_type = "Administrator"
+        else:
+            raise ValueError
+
+    except (KeyError, ValueError):
+        resp = redirect("/login")
+        resp.delete_cookie("sessid")
+        return resp
+
+    
+    return render_template("all_films.html", user_type=user_type)
 
 @app.route("/login")
 def login():

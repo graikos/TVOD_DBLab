@@ -227,7 +227,7 @@ class TableCreator {
             row.forEach(cell => {
                 let newtd = document.createElement("td");
                 if (cell === null) {
-                    cell = `<em>NA</em>`
+                    cell = `NA`;
                 } 
                 newtd.innerHTML = cell
                 newtr.appendChild(newtd);
@@ -435,9 +435,10 @@ class TableCreator {
 
 
 
-createPopUp = (host_elem, ptitle, objToClear, keyToClear) => {
+createPopUp = (host_elem, ptitle, objToClear, keyToClear, for_id) => {
     let popup = document.createElement("div");
     popup.classList.add("popup");
+    popup.setAttribute("data-for-id", for_id);
     let x = document.createElement("span")
     x.classList.add("material-icons");
     x.classList.add("close");

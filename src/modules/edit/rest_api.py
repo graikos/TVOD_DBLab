@@ -23,15 +23,27 @@ METHODS = {
     "FILM": {
         "ADD": (Film.add_film, ("title", "description", "release_year", "language", "original_language", "length", "rating", "special_features")),
         "UPDATE": (Film.update_film, ("film_id", "title", "description", "release_year", "language", "original_language", "length", "rating", "special_features")),
-        "UPDATE_ACTORS": (Film.update_film_actors, ("film_id", "new_actors")),
+        "UPDATE_ACTORS": (Film.update_film_actors, ("film_id", "actors")),
+        "ADD_ACTOR": (Film.add_film_actor, ("film_id", "first_name", "last_name")),
+        "DELETE_ACTOR": (Film.delete_film_actor, ("film_id", "actor_id")),
         "UPDATE_CATEGORIES": (Film.update_film_categories, ("film_id", "categories")),
+        "ADD_CATEGORY": (Film.add_film_category, ("film_id", "name")),
+        "DELETE_CATEGORY": (Film.delete_film_category, ("film_id", "category_id")),
         "DELETE": (Film.delete_film, ("film_id",))
     },
     "SHOW": {
-        "ADD": (Show.add_show, ("title", "description", "release_year", "language", "original_language", "length", "rating", "special_features")),
-        "UPDATE": (Show.update_show, ("show_id", "title", "description", "release_year", "language", "original_language", "length", "rating", "special_features")),
-        "UPDATE_ACTORS": (Show.update_show_actors, ("show_id", "new_actors")),
+        "ADD": (Show.add_show, ("title", "description", "release_year", "language", "original_language", "rating", "special_features")),
+        "UPDATE": (Show.update_show, ("show_id", "title", "description", "release_year", "language", "original_language", "rating", "special_features")),
+        "UPDATE_ACTORS": (Show.update_show_actors, ("show_id", "actors")),
+        "ADD_ACTOR": (Show.add_show_actor, ("show_id", "first_name", "last_name")),
+        "DELETE_ACTOR": (Show.delete_show_actor, ("show_id", "actor_id")),
         "UPDATE_CATEGORIES": (Show.update_show_categories, ("show_id", "categories")),
+        "ADD_CATEGORY": (Show.add_show_category, ("show_id", "name")),
+        "DELETE_CATEGORY": (Show.delete_show_category, ("show_id", "category_id")),
+        "UPDATE_SEASONS": (Show.update_show_seasons, ("show_id", "seasons")),
+        "ADD_SEASON": (Show.add_show_season, ("show_id", "episodes")),
+        "UPDATE_SEASON": (Show.update_show_season, ("season_id", "episodes")),
+        "DELETE_SEASON": (Show.delete_show_season, ("show_id", "season_id")),
         "DELETE": (Show.delete_show, ("show_id",))
     },
     "LANGUAGE": {
@@ -75,15 +87,22 @@ class Edit(Resource):
             if isinstance(user, Customer):
                 raise ValueError
 
+            print("Loading data...")
             data = json.loads(request.data)
+            print("Loaded data")
 
+            print("Getting expected arguments...")
             expected_args = METHODS[data["type"]][data["action"]][1]
+            print("Got expected arguments")
 
-            for arg in data:
-                if not (arg in {"type", "action"} or arg in expected_args):
+            for arg in expected_args:
+                if arg not in data:
+                    print(f"Didn't find expected argument: {arg}")
                     raise ValueError
 
+            print("Calling method...")
             METHODS[data["type"]][data["action"]][0](*(data[x] for x in METHODS[data["type"]][data["action"]][1]))
+            print("Called method")
             
             return make_response(jsonify(""), 200)
 

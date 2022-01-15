@@ -28,19 +28,19 @@ class Country:
     def add_country(country):
         cur = dbconn.cursor()
         cur.execute("INSERT INTO country (country) VALUES (%s)", (country,))
-        cur.commit()
+        dbconn.commit()
         cur.close()
 
     @staticmethod
     def update_country(country_id, country):
         cur = dbconn.cursor()
         cur.execute("UPDATE country SET country.country=%s WHERE country_id=%s", (country, country_id))
-        cur.commit()
+        dbconn.commit()
         cur.close()
 
     @staticmethod
     def delete_country(country_id):
         cur = dbconn.cursor()
         cur.execute("DELETE FROM country WHERE country_id=%s", (country_id,))
-        cur.commit()
+        dbconn.commit()
         cur.close()

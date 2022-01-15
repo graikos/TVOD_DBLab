@@ -113,14 +113,14 @@ class Address:
     def update_address(address_id, address, district, city_id, postal_code, phone):
         cur = dbconn.cursor()
         cur.execute("UPDATE address SET address=%s,district=%s,city_id=%s,postal_code=%s,phone=%s WHERE address_id=%s", (address, district, city_id, postal_code, phone, address_id))
-        cur.commit()
+        dbconn.commit()
         cur.close()
 
     @staticmethod
     def delete_address(address_id):
         cur = dbconn.cursor()
         cur.execute("DELETE FROM address WHERE address_id=%s", (address_id,))
-        cur.commit()
+        dbconn.commit()
         cur.close()
 
 

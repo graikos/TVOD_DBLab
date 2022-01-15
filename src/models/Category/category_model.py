@@ -67,7 +67,7 @@ class Category:
         cur.execute("INSERT INTO category (name) VALUES (%s)", (name,))
         cur.execute("SELECT LAST_INSERT_ID()")
         new_id = cur.fetchall()[0][0]
-        cur.commit()
+        dbconn.commit()
         cur.close()
 
         return new_id
@@ -76,14 +76,14 @@ class Category:
     def update_category(category_id, name):
         cur = dbconn.cursor()
         cur.execute("UPDATE category SET name=%s WHERE category_id=%s", (name, category_id))
-        cur.commit()
+        dbconn.commit()
         cur.close()
 
     @staticmethod
     def delete_category(category_id):
         cur = dbconn.cursor()
         cur.execute("DELETE FROM category WHERE category_id=%s", (category_id,))
-        cur.commit()
+        dbconn.commit()
         cur.close()
 
     

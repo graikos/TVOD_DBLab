@@ -37,19 +37,19 @@ class City:
         
         country_id = res[0][0]
         cur.execute("INSERT INTO city(city, country_id) VALUES (%s, %s)", (city, country_id))
-        cur.commit()
+        dbconn.commit()
         cur.close()
 
     @staticmethod
     def update_city(city_id, city):
         cur = dbconn.cursor()
         cur.execute("UPDATE city SET city=%s WHERE city_id=%s", (city, city_id))
-        cur.commit()
+        dbconn.commit()
         cur.close()
 
     @staticmethod
     def delete_city(city_id):
         cur = dbconn.cursor()
         cur.execute("DELETE FROM city WHERE city_id=%s", (city_id,))
-        cur.commit()
+        dbconn.commit()
         cur.close()

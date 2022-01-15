@@ -13,6 +13,9 @@ def get_value_tuple(array):
 # values_list: list of iterables, each representing a row to insert
 # table_cols: columns to populate; if None is passed, all columns of table will be populated
 def pack_values_into_sql_insert(table_name, total_rows, total_columns, table_cols=None):
+    if not total_rows:
+        return None
+
     query = f"INSERT INTO {table_name} "
 
     row_str = ""
@@ -28,9 +31,9 @@ def pack_values_into_sql_insert(table_name, total_rows, total_columns, table_col
     query += row_str + " VALUES "
 
     for _ in range(total_rows):
-        query += build_row(total_columns) + " "
+        query += build_row(total_columns) + ", "
 
-    return query
+    return query[:-2]
 
 
 

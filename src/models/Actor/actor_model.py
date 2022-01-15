@@ -72,7 +72,7 @@ class Actor:
         cur.execute("INSERT INTO actor (first_name, last_name) VALUES (%s,%s)", (first_name, last_name))
         cur.execute("SELECT LAST_INSERT_ID()")
         new_id = cur.fetchall()[0][0]
-        cur.commit()
+        dbconn.commit()
         cur.close()
 
         return new_id
@@ -83,12 +83,12 @@ class Actor:
     def update_actor(actor_id, first_name, last_name):
         cur = dbconn.cursor()
         cur.execute("UPDATE actor SET first_name=%s,last_name=%s WHERE actor_id=%s", (first_name, last_name, actor_id))
-        cur.commit()
+        dbconn.commit()
         cur.close()
 
     @staticmethod
     def delete_actor(actor_id):
         cur = dbconn.cursor()
         cur.execute("DELETE FROM actor WHERE actor_id=%s", (actor_id,))
-        cur.commit()
+        dbconn.commit()
         cur.close()
