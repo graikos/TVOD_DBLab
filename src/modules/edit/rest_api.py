@@ -48,6 +48,7 @@ METHODS = {
     },
     "LANGUAGE": {
         "ADD": (Language.add_language, ("name",)),
+        "UPDATE": (Language.update_language, ("language_id", "name")),
         "DELETE": (Language.delete_language, ("language_id",))
     },
     "CATEGORY": {

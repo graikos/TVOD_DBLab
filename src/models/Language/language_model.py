@@ -42,6 +42,13 @@ class Language:
         return new_id
 
     @staticmethod
+    def update_language(language_id, name):
+        cur = dbconn.cursor()
+        cur.execute("UPDATE language SET name=%s WHERE language_id=%s", (name, language_id))
+        dbconn.commit()
+        cur.close()
+
+    @staticmethod
     def delete_language(language_id):
         cur = dbconn.cursor()
         cur.execute("DELETE FROM language WHERE language_id=%s", (language_id,))

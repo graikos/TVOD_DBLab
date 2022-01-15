@@ -128,6 +128,92 @@ def all_films():
     
     return render_template("all_films.html", user_type=user_type)
 
+@app.route("/actors")
+def all_actors():
+    user_type = ""
+    try:
+        token = request.cookies["sessid"]
+        user = tokens[token]
+        if isinstance(user,Employee):
+            user_type = "Employee"
+        elif isinstance(user, Administrator):
+            user_type = "Administrator"
+        else:
+            raise ValueError
+
+    except (KeyError, ValueError):
+        resp = redirect("/login")
+        resp.delete_cookie("sessid")
+        return resp
+
+    return render_template("all_actors.html", user_type=user_type)
+
+@app.route("/categories")
+def all_categories():
+    user_type = ""
+    try:
+        token = request.cookies["sessid"]
+        user = tokens[token]
+        if isinstance(user,Employee):
+            user_type = "Employee"
+        elif isinstance(user, Administrator):
+            user_type = "Administrator"
+        else:
+            raise ValueError
+
+    except (KeyError, ValueError):
+        resp = redirect("/login")
+        resp.delete_cookie("sessid")
+        return resp
+
+    
+    return render_template("all_categories.html", user_type=user_type)
+
+@app.route("/languages")
+def all_languages():
+    user_type = ""
+    try:
+        token = request.cookies["sessid"]
+        user = tokens[token]
+        if isinstance(user,Employee):
+            user_type = "Employee"
+        elif isinstance(user, Administrator):
+            user_type = "Administrator"
+        else:
+            raise ValueError
+
+    except (KeyError, ValueError):
+        resp = redirect("/login")
+        resp.delete_cookie("sessid")
+        return resp
+
+    
+    return render_template("all_languages.html", user_type=user_type)
+
+
+@app.route("/countries")
+def all_countries():
+    user_type = ""
+    try:
+        token = request.cookies["sessid"]
+        user = tokens[token]
+        if isinstance(user,Employee):
+            user_type = "Employee"
+        elif isinstance(user, Administrator):
+            user_type = "Administrator"
+        else:
+            raise ValueError
+
+    except (KeyError, ValueError):
+        resp = redirect("/login")
+        resp.delete_cookie("sessid")
+        return resp
+
+    
+    return render_template("all_countries.html", user_type=user_type)
+
+
+
 @app.route("/login")
 def login():
     return render_template("login.html")

@@ -96,7 +96,7 @@ const fetchShows = (checkPoint, refreshTable) => {
     let req = new XMLHttpRequest();
     let url = hostname+fetchEndpoint;
     let itemnum = batch;
-    if (checkPoint) {
+    if (checkPoint && haveLoaded > batch) {
         itemnum = haveLoaded;
     }
     let params = "?start="+start+"&end="+itemnum+"&type=ALL_SHOWS";

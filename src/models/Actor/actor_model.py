@@ -16,7 +16,7 @@ class Actor:
     @staticmethod
     def get_actors(start, end):
         cur = dbconn.cursor()
-        cur.execute("SELECT * FROM actor LIMIT %s,%s", (start, end))
+        cur.execute("SELECT * FROM actor ORDER BY last_name ASC LIMIT %s,%s", (start, end))
         res = cur.fetchall()
         cur.close()
 
