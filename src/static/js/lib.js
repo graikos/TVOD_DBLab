@@ -272,6 +272,9 @@ class TableCreator {
         let newtr = document.createElement("tr");
         row.forEach(cell => {
             let newtd = document.createElement("td");
+            if (cell === null) {
+                cell = `NA`;
+            }
             newtd.innerHTML = cell
             newtr.appendChild(newtd);
         });
@@ -481,5 +484,15 @@ showLoadMore = () => {
     let loadmore = document.getElementById("load-more-btn");
     if (loadmore !== null) {
         loadmore.classList.remove("hidden-element");
+    }
+}
+
+replaceNA = (val) => {
+    console.log(val);
+    if (val === "NA") {
+        console.log('returning null');
+        return null;
+    } else {
+        return val
     }
 }

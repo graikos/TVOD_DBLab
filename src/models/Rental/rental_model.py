@@ -25,21 +25,21 @@ class Rental:
     @staticmethod
     def get_most_rented(most_rented_type):
         prev_date = datetime.date.today()
-        prev_date.replace(day=1)
+        prev_date = prev_date.replace(day=1)
         if prev_date.month == 1:
-            prev_date.replace(month=12)
-            prev_date.replace(year=prev_date.year-1)
+            prev_date = prev_date.replace(month=12)
+            prev_date = prev_date.replace(year=prev_date.year-1)
         else:
-            prev_date.replace(month=prev_date.month-1)
+            prev_date = prev_date.replace(month=prev_date.month-1)
 
         first = prev_date.strftime("%Y-%m-%d")
-        prev_date.replace(day=monthrange(prev_date.year, prev_date.month)[1])
+        prev_date = prev_date.replace(day=monthrange(prev_date.year, prev_date.month)[1])
         last = prev_date.strftime("%Y-%m-%d")
         args = (most_rented_type, 5, first, last)
 
         cur = dbconn.cursor()
         cur.callproc("most_rented", args)
-        res = cur.fetchall()
+        res = list(cur.stored_results())[0].fetchall()
         cur.close()
 
         return res
@@ -48,7 +48,7 @@ class Rental:
     def get_income():
         cur = dbconn.cursor()
         cur.callproc("profits_by_month", tuple())
-        res = cur.fetchall()
+        res = list(cur.stored_results())[0].fetchall()
         cur.close()
 
         return res

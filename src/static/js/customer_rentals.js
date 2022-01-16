@@ -47,7 +47,7 @@ const createRentalsTable = (rentalsData) => {
         let norentals = document.createElement("h2");
         norentals.classList.add("no-entries-text");
         norentals.innerHTML = `No rentals found`;
-        document.getElementsByClassName["main-content"][0].appendChild(norentals);
+        document.getElementsByClassName("main-content")[0].appendChild(norentals);
         return;
     }
     table = new TableCreator(document.getElementsByClassName("main-content")[0], ["ID", "Date", "Amount", "Type", "Title", "Season Number",

@@ -2,13 +2,14 @@ from storage import dbconn
 
 
 class Address:
-    def __init__(self, address_id, address, district, city_id, postal_code, phone):
+    def __init__(self, address_id, address, district, city_id, postal_code, phone, city):
         self.address_id = address_id
         self.address = address
         self.district = district
         self.city_id = city_id
         self.postal_code = postal_code
         self.phone = phone
+        self.city = city
 
     def to_dict(self):
         return {
@@ -16,14 +17,15 @@ class Address:
             "address": self.address,
             "district": self.district,
             "city_id": self.city_id,
-            "posal_code": self.postal_code,
-            "phone": self.phone
+            "postal_code": self.postal_code,
+            "phone": self.phone,
+            "city": self.city
         }
 
     @staticmethod
     def get_addresses(start, end):
         cur = dbconn.cursor()
-        cur.execute("SELECT * FROM address LIMIT %s,%s", (start, end))
+        cur.execute("SELECT address_id,address,district,address.city_id,postal_code,phone,city FROM address INNER JOIN city ON address.city_id=city.city_id LIMIT %s,%s", (start, end))
         res = cur.fetchall()
         cur.close()
 
@@ -82,24 +84,16 @@ class Address:
 
     # adds address and returns address ID
     @staticmethod
-    def add_address(to_country, to_city, new_address, new_district, new_postal_code, new_phone):
+    def add_address(city_id, new_address, new_district, new_postal_code, new_phone):
         cursor = dbconn.cursor()
         # check if address exists
-        cursor.execute("SELECT address_id FROM address INNER JOIN city ON address.city_id=city.city_id INNER JOIN country ON city.country_id=country.country_id WHERE country.country=%s AND city.city=%s AND address.address=%s AND district=%s AND postal_code=%s AND phone=%s", (to_country, to_city, new_address, new_district, new_postal_code, new_phone))
+        cursor.execute("SELECT address_id FROM address INNER JOIN city ON address.city_id=city.city_id WHERE city.city_id=%s AND address.address=%s AND district=%s AND postal_code=%s AND phone=%s", (city_id, new_address, new_district, new_postal_code, new_phone))
         res = cursor.fetchall()
 
         # if it exists, return its id
         if res:
             cursor.close()
             return res[0][0]
-
-        # find city id
-        cursor.execute("SELECT city_id FROM city INNER JOIN country ON city.country_id=country.country_id WHERE city.city=%s AND country.country=%s", (to_city, to_country))
-        res = cursor.fetchall()
-        if not res:
-            cursor.close()
-            raise ValueError
-        city_id = res[0][0]
 
         # insert new address and return its id
         cursor.execute("INSERT INTO address (address, district, city_id, postal_code, phone) VALUES (%s, %s, %s, %s, %s)", (new_address, new_district, city_id, new_postal_code, new_phone))

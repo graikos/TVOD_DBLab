@@ -1,28 +1,43 @@
 from storage import dbconn
 
 class City:
-    def __init__(self, city_id, city, country_id):
+    def __init__(self, city_id, city, country_id, country):
         self.city_id = city_id
         self.city = city
         self.country_id = country_id
+        self.country = country
 
     def to_dict(self):
         return {
             "city_id": self.city_id,
             "city": self.city,
-            "country_id": self.country_id
+            "country_id": self.country_id,
+            "country": self.country
         }
 
     @staticmethod
     def get_cities(start, end):
         cur = dbconn.cursor()
-        cur.execute("SELECT * FROM city LIMIT %s,%s", (start, end))
+        cur.execute("SELECT city_id,city,city.country_id,country FROM city INNER JOIN country ON city.country_id=country.country_id LIMIT %s,%s", (start, end))
         res = cur.fetchall()
         cur.close()
 
         cities = []
         for city in res:
             cities.append(City(*city))
+
+        return cities
+
+    @staticmethod
+    def get_all_cities():
+        cur = dbconn.cursor()
+        cur.execute("SELECT * FROM city")
+        res = cur.fetchall()
+        cur.close()
+
+        cities = []
+        for city in res:
+            cities.append(City(*city, None))
 
         return cities
 
@@ -41,9 +56,9 @@ class City:
         cur.close()
 
     @staticmethod
-    def update_city(city_id, city):
+    def update_city(city_id, city, country_id):
         cur = dbconn.cursor()
-        cur.execute("UPDATE city SET city=%s WHERE city_id=%s", (city, city_id))
+        cur.execute("UPDATE city SET city=%s,country_id=%s WHERE city_id=%s", (city, country_id, city_id))
         dbconn.commit()
         cur.close()
 

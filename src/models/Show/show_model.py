@@ -5,7 +5,7 @@ from src.models.Actor.actor_model import Actor
 from src.models.Category.category_model import Category
 
 class Show:
-    def __init__(self, show_id, title, description, release_year, language, original_language, seasons, rating, special_features, categories, actors):
+    def __init__(self, show_id, title, description, release_year, language, original_language, seasons, rating, special_features, categories, actors, in_inventory):
         self.show_id = show_id
         self.title = title
         self.description = description
@@ -17,6 +17,7 @@ class Show:
         self.special_features = tuple(special_features) if special_features else None
         self.categories = categories
         self.actors = actors
+        self.in_inventory = in_inventory
 
     def to_dict(self):
         return {
@@ -30,7 +31,8 @@ class Show:
             "rating": self.rating,
             "special_features": self.special_features,
             "categories": self.categories,
-            "actors": self.actors
+            "actors": self.actors,
+            "in_inventory": self.in_inventory
         }
 
     @staticmethod
@@ -63,7 +65,7 @@ class Show:
             original_language = cur.fetchall()
             original_language = original_language[0] if original_language else None
 
-            shows.append(Show(show[0], show[1], show[2], show[3], language, original_language, season_list, show[6], show[7], categories, actors))
+            shows.append(Show(show[0], show[1], show[2], show[3], language, original_language, season_list, show[6], show[7], categories, actors, True))
 
 
         cur.close()
@@ -101,7 +103,10 @@ class Show:
             original_language = cur.fetchall()
             original_language = original_language[0] if original_language else None
 
-            shows.append(Show(show[0], show[1], show[2], show[3], language, original_language, season_list, show[6], show[7], categories, actors))
+            cur.execute("SELECT * FROM inventory WHERE show_id=%s LIMIT 1", (show[0],))
+            in_inventory = bool(cur.fetchall())
+
+            shows.append(Show(show[0], show[1], show[2], show[3], language, original_language, season_list, show[6], show[7], categories, actors, in_inventory))
 
         cur.close()
 

@@ -74,7 +74,7 @@ const fetchActors = (checkPoint, refreshTable) => {
                 if (resp.length < batch) {
                     document.getElementById("load-more-btn").remove();
                 }
-                start += batch;
+                start += itemnum;
             } else {
                 makeToast("failure", "Error fetching data", 1500);
             }
@@ -86,7 +86,8 @@ const createActorsTable = (actorsData) => {
         let nosh = document.createElement("h2");
         nosh.classList.add("no-entries-text");
         nosh.innerHTML = `No actors found`;
-        document.getElementsByClassName["main-content"][0].appendChild(nosh);
+        document.getElementsByClassName("main-content")[0].appendChild(nosh);
+        return;
     }
     let table = new TableCreator(document.getElementsByClassName("main-content")[0], ["ID", "First Name", "Last Name"],
      [], 0, actorActions);

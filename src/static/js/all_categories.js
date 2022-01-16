@@ -74,7 +74,7 @@ const fetchCategories = (checkPoint, refreshTable) => {
                 if (resp.length < batch) {
                     document.getElementById("load-more-btn").remove();
                 }
-                start += batch;
+                start += itemnum;
             } else {
                 makeToast("failure", "Error fetching data", 1500);
             }
@@ -87,7 +87,8 @@ const createCategoriesTable = (catData) => {
         let nosh = document.createElement("h2");
         nosh.classList.add("no-entries-text");
         nosh.innerHTML = `No categories found`;
-        document.getElementsByClassName["main-content"][0].appendChild(nosh);
+        document.getElementsByClassName("main-content")[0].appendChild(nosh);
+        return;
     }
     let table = new TableCreator(document.getElementsByClassName("main-content")[0], ["ID", "Category Name"],
      [], 0, categoriesActions);

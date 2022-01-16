@@ -27,18 +27,50 @@ window.onload = () => {
             return;
         }
         activeAdd = true;
-        let table = tables["countries_table"];
-        let newrow = table.appendRow(["", ""]);
-        table.editHTMLRow([undefined, "text"], newrow, saveNewCountry, [], () => {
+        let table = tables["cities_table"];
+        let newrow = table.appendRow(["", "", ""]);
+        table.editHTMLRow([undefined, "select", "text"], newrow, saveNewCity, [{
+            "options": allcountries.map(c => c["country"])
+        }], () => {
             newrow.remove();
             activeAdd = false;
         }, true);
     });
 };
 
+let allcountries = [];
+
+const fetchCountries = () => {
+    let token = getCookie("sessid");
+    
+    let req = new XMLHttpRequest();
+    let url = hostname+fetchEndpoint;
+    let params = "?type=ALL_COUNTRIES";
+
+    url = encodeURI(url+params);
+
+    req.open("get", url);
+    req.setRequestHeader("Authorization", token);
+    req.send();
+    enableLoader();
+    req.onreadystatechange = () => {
+        if (req.readyState == 4) {
+            disableLoader();
+            if (req.status == 200) {
+                resp = JSON.parse(req.response);
+                resp.forEach(country => {
+                    allcountries.push(country);
+                });
+                fetchCities();
+            } else {
+                makeToast("failure", "Error fetching countries", 1500);
+            }
+        }
+    }
+};
 
 
-const fetchCountries = (checkPoint, refreshTable) => {
+const fetchCities = (checkPoint, refreshTable) => {
     let token = getCookie("sessid");
     
     let req = new XMLHttpRequest();
@@ -47,7 +79,7 @@ const fetchCountries = (checkPoint, refreshTable) => {
     if (checkPoint && haveLoaded > batch) {
         itemnum = haveLoaded;
     }
-    let params = "?start="+start+"&end="+itemnum+"&type=COUNTRIES";
+    let params = "?start="+start+"&end="+itemnum+"&type=CITIES";
 
     url = encodeURI(url+params);
 
@@ -61,14 +93,14 @@ const fetchCountries = (checkPoint, refreshTable) => {
             if (req.status == 200) {
                 resp = JSON.parse(req.response);
                 haveLoaded += resp.length;
-                if (tables["countries_table"] === undefined || refreshTable) {
+                if (tables["cities_table"] === undefined || refreshTable) {
                     if (refreshTable) {
                         haveLoaded = resp.length+1;
                     }
-                    createCountriesTable(resp);
+                    createCitiesTable(resp);
                 } else {
-                    resp.forEach(country => {
-                        tables["countries_table"].appendRow([country["country_id"], country["country"]]);
+                    resp.forEach(city => {
+                        tables["cities_table"].appendRow([city["city_id"], city["country"], city["city"]]);
                     });
                 }
                 if (resp.length < batch) {
@@ -82,39 +114,56 @@ const fetchCountries = (checkPoint, refreshTable) => {
     }
 };
 
-const createCountriesTable = (countData) => {
-    if (countData.length == 0) {
+const createCitiesTable = (cityData) => {
+    if (cityData.length == 0) {
         let nosh = document.createElement("h2");
         nosh.classList.add("no-entries-text");
-        nosh.innerHTML = `No countries found`;
+        nosh.innerHTML = `No cities found`;
         document.getElementsByClassName("main-content")[0].appendChild(nosh);
         return;
     }
-    let table = new TableCreator(document.getElementsByClassName("main-content")[0], ["ID", "Country"],
-     [], 0, countriesActions);
-     countData.forEach(country => {
-        table.addInternalRow([country["country_id"], country["country"]]);
+    let table = new TableCreator(document.getElementsByClassName("main-content")[0], ["ID", "Country", "City"],
+     [], 0, citiesActions);
+     cityData.forEach(city => {
+        table.addInternalRow([city["city_id"], city["country"], city["city"]]);
      });
-     table.createTable(true, fetchCountries, false);
-     tables["countries_table"] = table;
+     table.createTable(true, fetchCities, false);
+     tables["cities_table"] = table;
 };
 
 
-const editCountry = (e) => {
+const editCity = (e) => {
     let currentRow = e.target.parentNode.parentNode;
-    tables["countries_table"].editHTMLRow([undefined, "text"], currentRow, confirmEditCountry, []);
+    tables["cities_table"].editHTMLRow([undefined, "select", "text"], currentRow, confirmEditCity, [{
+        "options": allcountries.map(c => c["country"])
+    }]);
 };
 
 
-const confirmEditCountry = (e, values) => {
+const confirmEditCity = (e, values) => {
 
-    let country_id = parseInt(e.target.getAttribute("data-row-id"));
+    let city_id = parseInt(e.target.getAttribute("data-row-id"));
+    let country_name = values[1];
+    let country_id;
+    allcountries.forEach(count => {
+        if (country_name == count["country"]) {
+            country_id = count["country_id"];
+            return;
+        }
+    });
+    if (country_id === undefined) {
+        console.log("country not found");
+        console.log(country_name);
+        return;
+    }
+
 
     let data = {
-        "type": "COUNTRY",
+        "type": "CITY",
         "action": "UPDATE",
         "country_id": country_id,
-        "country": `${values[1]}`
+        "city_id": city_id,
+        "city": `${values[2]}`
     };
 
     data = JSON.stringify(data);
@@ -136,30 +185,30 @@ const confirmEditCountry = (e, values) => {
         if (req.readyState == 4) {
             disableLoader();
             if (req.status == 200) {
-                makeToast("success", "Successfully updated country", 1000);
-                let tab = tables["countries_table"];
+                makeToast("success", "Successfully updated city", 1000);
+                let tab = tables["cities_table"];
                 tab.replaceHTMLRow(values, e.target.parentNode.parentNode);
                 tab.replaceActionsInHTMLRow(tab.actions, e.target.parentNode.parentNode);
                 tab.activeClose = false;
             } else {
-                makeToast("failure", "Error updating country", 1000);
+                makeToast("failure", "Error updating city", 1000);
             }
         }
     };
 };
 
-const removeCountry = (e) => {
+const removeCity = (e) => {
     let currentRow = e.target.parentNode.parentNode;
-    tables["countries_table"].editHTMLRow([], currentRow, confirmRemoveCountry);
+    tables["cities_table"].editHTMLRow([], currentRow, confirmRemoveCity);
 }
 
-const confirmRemoveCountry = (e, values) => {
-    let country_id = parseInt(e.target.getAttribute("data-row-id"));
+const confirmRemoveCity = (e, values) => {
+    let city_id = parseInt(e.target.getAttribute("data-row-id"));
 
     let data = {
-        "type": "COUNTRY",
+        "type": "CITY",
         "action": "DELETE",
-        "country_id": country_id
+        "city_id": city_id
     };
     data = JSON.stringify(data);
 
@@ -180,29 +229,30 @@ const confirmRemoveCountry = (e, values) => {
         if (req.readyState == 4) {
             disableLoader();
             if (req.status == 200) {
-                makeToast("success", "Successfully removed country", 1000);
-                let tab = tables["countries_table"];
+                makeToast("success", "Successfully removed city", 1000);
+                let tab = tables["cities_table"];
                 tab.tableRoot.remove();
                 start = 0;
-                fetchCountries(true, true);
+                fetchCities(true, true);
                 tab.activeClose = false;
             } else {
-                makeToast("failure", "Error removing country", 1000);
+                makeToast("failure", "Error removing city", 1000);
             }
         }
     };
 
 };
 
-const saveNewCountry = (e, values) => {
+const saveNewCity = (e, values) => {
     activeAdd = false;
 
-    tables["countries_table"].rows[tables["countries_table"].rows.length - 1] = values;
+    tables["cities_table"].rows[tables["cities_table"].rows.length - 1] = values;
 
     let data = {
-        "type": "COUNTRY",
+        "type": "CITY",
         "action": "ADD",
-        "country": `${values[1]}`
+        "to_country": `${values[1]}`,
+        "city": `${values[2]}`
     };
 
     data = JSON.stringify(data);
@@ -224,14 +274,14 @@ const saveNewCountry = (e, values) => {
         if (req.readyState == 4) {
             disableLoader();
             if (req.status == 200) {
-                makeToast("success", "Successfully added country", 1000);
-                let tab = tables["countries_table"];
+                makeToast("success", "Successfully added city", 1000);
+                let tab = tables["cities_table"];
                 tab.tableRoot.remove();
                 start = 0;
-                fetchCountries(true, true);
+                fetchCities(true, true);
                 tab.activeClose = false;
             } else {
-                makeToast("failure", "Error adding country", 1000);
+                makeToast("failure", "Error adding city", 1000);
             }
         }
     };
@@ -239,13 +289,13 @@ const saveNewCountry = (e, values) => {
 };
 
 
-let countriesActions = {
+let citiesActions = {
     "delete": {
-        "func": removeCountry,
-        "desc": "Remove Country"
+        "func": removeCity,
+        "desc": "Remove City"
     },
     "edit": {
-        "func": editCountry,
-        "desc": "Edit Country"
+        "func": editCity,
+        "desc": "Edit City"
     }
 };

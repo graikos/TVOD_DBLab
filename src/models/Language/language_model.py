@@ -26,6 +26,9 @@ class Language:
 
     @staticmethod
     def add_language(name):
+        if not name:
+            return None
+
         cur = dbconn.cursor()
         cur.execute("SELECT * FROM language where name=%s", (name,))
         res = cur.fetchall()

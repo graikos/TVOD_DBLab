@@ -31,12 +31,14 @@ METHODS = {
     "ACTORS_BY_SHOW_ID": (Actor.get_actor_by_show_id, ("show_id",)),
     "CATEGORIES_BY_FILM_ID": (Category.get_category_by_film_id, ("film_id",)),
     "CATEGORIES_BY_SHOW_ID": (Category.get_category_by_show_id, ("show_id",)),
-    "SEASONS_BY_SHOW_ID": (Season.get_show_seasons_by_id, ("show_id",))
+    "SEASONS_BY_SHOW_ID": (Season.get_show_seasons_by_id, ("show_id",)),
+    "ALL_COUNTRIES": (Country.get_all_countries, ()),
+    "ALL_CITIES": (City.get_all_cities, ())
 }
 
 ALLOWED_METHODS = {
     Customer: {"FILMS", "SHOWS"},
-    Employee: {"CUSTOMERS", "ACTORS", "LANGUAGES", "CATEGORIES", "ADDRESSES", "COUNTRIES", "CITIES", "INVENTORY", "ALL_FILMS", "ALL_SHOWS", "ACTORS_BY_FILM_ID", "ACTORS_BY_SHOW_ID", "CATEGORIES_BY_FILM_ID", "CATEGORIES_BY_SHOW_ID", "SEASONS_BY_SHOW_ID"},
+    Employee: {"CUSTOMERS", "ACTORS", "LANGUAGES", "CATEGORIES", "ADDRESSES", "COUNTRIES", "CITIES", "INVENTORY", "ALL_FILMS", "ALL_SHOWS", "ACTORS_BY_FILM_ID", "ACTORS_BY_SHOW_ID", "CATEGORIES_BY_FILM_ID", "CATEGORIES_BY_SHOW_ID", "SEASONS_BY_SHOW_ID", "ALL_COUNTRIES", "ALL_CITIES"},
     Administrator: {"EMPLOYEES"}
 }
 

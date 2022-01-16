@@ -6,7 +6,7 @@ from src.models.Category.category_model import Category
 
 
 class Film:
-    def __init__(self, film_id, title, description, release_year, language, original_language, length, rating, special_features, categories, actors):
+    def __init__(self, film_id, title, description, release_year, language, original_language, length, rating, special_features, categories, actors, in_inventory):
         self.film_id = film_id
         self.title = title
         self.description = description
@@ -18,6 +18,7 @@ class Film:
         self.special_features = tuple(special_features) if special_features else None
         self.categories = categories
         self.actors = actors
+        self.in_inventory = in_inventory
 
     def to_dict(self):
         return {
@@ -31,7 +32,8 @@ class Film:
             "rating": self.rating,
             "special_features": self.special_features,
             "categories": self.categories,
-            "actors": self.actors
+            "actors": self.actors,
+            "in_inventory": self.in_inventory
         }
 
     @staticmethod
@@ -54,7 +56,7 @@ class Film:
             original_language = original_language[0] if original_language else None
 
             films.append(Film(film[0], film[1], film[2], film[3], language, original_language, film[6],
-            film[7], film[8], categories, actors))
+            film[7], film[8], categories, actors, True))
         
         cur.close()
 
@@ -79,8 +81,11 @@ class Film:
             original_language = cur.fetchall()
             original_language = original_language[0] if original_language else None
 
+            cur.execute("SELECT * FROM inventory WHERE film_id=%s LIMIT 1", (film[0],))
+            in_inventory = bool(cur.fetchall())
+
             films.append(Film(film[0], film[1], film[2], film[3], language, original_language, film[6],
-            film[7], film[8], categories, actors))
+            film[7], film[8], categories, actors, in_inventory))
 
         cur.close()
 

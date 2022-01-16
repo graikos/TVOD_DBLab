@@ -1,12 +1,12 @@
-
 <!DOCTYPE html>
 <html>
     <head>
         <title>TVOnDemand</title>
         <link rel="stylesheet" href="../static/style/style.css">
         <link rel="stylesheet" href="../static/style/all_customers.css">
+        <link rel="stylesheet" href="../static/style/most_rented.css">
         <script src="../static/js/lib.js" type="text/javascript"></script>
-        <script src="../static/js/all_categories.js" type="text/javascript"></script>
+        <script src="../static/js/most_rented.js" type="text/javascript"></script>
     </head>
     <body>
         <div class="navbar">
@@ -17,16 +17,22 @@
             <a class="tab-btn" id="all-shows-tab" href="/shows">Shows</a>
             <a class="tab-btn" id="all-films-tab" href="/films">Films</a>
             <a class="tab-btn" id="all-actors-tab" href="/actors">Actors</a>
-            <a class="tab-btn tab-btn-active" id="all-categories-tab" href="/categories">Categories</a>
+            <a class="tab-btn" id="all-categories-tab" href="/categories">Categories</a>
             <a class="tab-btn" id="all-languages-tab" href="/languages">Languages</a>
             <a class="tab-btn" id="all-countries-tab" href="/countries">Countries</a>
             <a class="tab-btn" id="all-cities-tab" href="/cities">Cities</a>
             <a class="tab-btn" id="all-addresses-tab" href="/addresses">Addresses</a>
-            <a class="tab-btn" id="most-rented-tab" href="/mostrented">Most Rented</a>
+            <a class="tab-btn tab-btn-active" id="most-rented-tab" href="/mostrented">Most Rented</a>
             {% if user_type == "Employee" %}
             {% elif sub_type == "Administrator" %}
             {% endif %}
             <a class="tab-btn" id="log-out">Log out</a>
+        </div>
+        <div class="main-container">
+            <div class="tab-bar">
+                <a class="tab-btn content-tab-btn content-tab-btn-active" id="shows-tab-btn">TV Shows</a>
+                <a class="tab-btn content-tab-btn" id="films-tab-btn">Films</a>
+            </div>
         </div>
         <div class="main-content">
         </div>

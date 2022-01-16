@@ -34,7 +34,7 @@ window.onload = () => {
         activeAdd = true;
         let table = tables["shows_table"];
         let newrow = table.appendRow(["", "", "", "", "", "", ""]);
-        table.editHTMLRow([undefined, "text", "text", "select", "text", "text", "text"], newrow, saveNewShow, [{"options": ratings}], () => {
+        table.editHTMLRow([undefined, "text", "text", "select", "text", "text", "text", undefined], newrow, saveNewShow, [{"options": ratings}], () => {
             newrow.remove();
             activeAdd = false;
         }, true);
@@ -46,18 +46,20 @@ const saveNewShow = (e, values) => {
 
     tables["shows_table"].rows[tables["shows_table"].rows.length - 1] = values;
 
-    let data = `{
+    let data = {
         "type": "SHOW",
         "action": "ADD",
-        "title": "${values[1]}",
-        "description": "${values[2]}",
-        "release_year": ${parseInt(values[6])},
-        "language": "${values[4]}",
-        "original_language": "${values[5]}",
-        "rating": "${values[3]}",
+        "show_id": show_id,
+        "title": values[1],
+        "description": values[2],
+        "release_year": parseInt(values[6]),
+        "language": replaceNA(values[4]),
+        "original_language": replaceNA(values[5]),
+        "rating": values[3],
         "special_features": ""
-    }`;
+    };
 
+    data = JSON.stringify(data);
     let token = getCookie("sessid");
     
     let req = new XMLHttpRequest();
@@ -124,10 +126,10 @@ const fetchShows = (checkPoint, refreshTable) => {
                     }
                     resp.forEach(show => {
                         tables["shows_table"].appendRow([show["show_id"], show["title"], show["description"],  
-                        show["rating"], show["language"].join(", "), show["original_language"].join(", "), show["release_year"]]);
+                        show["rating"], joinelem(show["language"]), joinelem(show["original_language"]), show["release_year"], (show["in_inventory"]? "Yes": "No")]);
                     });
                 }
-                start += batch;
+                start += itemnum;
             } else {
                 makeToast("failure", "Error fetching data", 1500);
             }
@@ -139,14 +141,15 @@ const createShowsTable = (showData) => {
         let nosh = document.createElement("h2");
         nosh.classList.add("no-entries-text");
         nosh.innerHTML = `No shows found`;
-        document.getElementsByClassName["main-content"][0].appendChild(nosh);
+        document.getElementsByClassName("main-content")[0].appendChild(nosh);
+        return;
     }
     let table = new TableCreator(document.getElementsByClassName("main-content")[0], ["ID", "Title", "Description", "Rating",
-     "Language", "Original Language", "Release Year"],
+     "Language", "Original Language", "Release Year", "Available"],
      [], 0, showsActions);
      showData.forEach(show => {
         table.addInternalRow([show["show_id"], show["title"], show["description"],  
-        show["rating"], show["language"].join(", "), show["original_language"].join(", "), show["release_year"]]);
+        show["rating"], joinelem(show["language"]), joinelem(show["original_language"]), show["release_year"], (show["in_inventory"]? "Yes":"No")]);
      });
      table.createTable(true, fetchShows, true);
      tables["shows_table"] = table;
@@ -155,7 +158,7 @@ const createShowsTable = (showData) => {
 
 const editShow = (e) => {
     let currentRow = e.target.parentNode.parentNode;
-    tables["shows_table"].editHTMLRow([undefined, "text", "text", "select", "text", "text", "text"], currentRow, confirmEditShow, [
+    tables["shows_table"].editHTMLRow([undefined, "text", "text", "select", "text", "text", "text", undefined], currentRow, confirmEditShow, [
         {
             "options": ratings
         }
@@ -164,22 +167,25 @@ const editShow = (e) => {
 
 
 
+
 const confirmEditShow = (e, values) => {
 
     let show_id = parseInt(e.target.getAttribute("data-row-id"));
 
-    let data = `{
+    let data = {
         "type": "SHOW",
         "action": "UPDATE",
-        "show_id": ${show_id},
-        "title": "${values[1]}",
-        "description": "${values[2]}",
-        "release_year": ${parseInt(values[6])},
-        "language": "${values[4]}",
-        "original_language": "${values[5]}",
-        "rating": "${values[3]}",
+        "show_id": show_id,
+        "title": values[1],
+        "description": values[2],
+        "release_year": parseInt(values[6]),
+        "language": replaceNA(values[4]),
+        "original_language": replaceNA(values[5]),
+        "rating": values[3],
         "special_features": ""
-    }`;
+    };
+
+    data = JSON.stringify(data);
 
     let token = getCookie("sessid");
     
@@ -209,6 +215,58 @@ const confirmEditShow = (e, values) => {
         }
     };
 };
+
+
+const toggleInventory = (e) => {
+    let currentRow = e.target.parentNode.parentNode;
+    tables["shows_table"].editHTMLRow([], currentRow, confirmToggleInventory, []);
+};
+
+const confirmToggleInventory = (e, values) => {
+    let show_id = parseInt(e.target.getAttribute("data-row-id"));
+
+    let in_inventory = (values[7] === "Yes");
+
+    let data = {
+        "type": "INVENTORY",
+        "action": "ADD_SHOW",
+        "show_id": show_id
+    };
+
+    data = JSON.stringify(data);
+
+    let token = getCookie("sessid");
+    
+    let req = new XMLHttpRequest();
+    let url = hostname+editEndpoint;
+
+    url = encodeURI(url);
+    req.open("put", url);
+    req.setRequestHeader("Content-Type", "application/json");
+    req.setRequestHeader("Authorization", token);
+    req.send(data);
+
+
+    enableLoader();
+    req.onreadystatechange = () => {
+        if (req.readyState == 4) {
+            disableLoader();
+            if (req.status == 200) {
+                makeToast("success", "Successfully added to inventory", 1000);
+                let tab = tables["shows_table"];
+                values[7] = in_inventory? "No": "Yes";
+                tab.replaceHTMLRow(values, e.target.parentNode.parentNode);
+                tab.replaceActionsInHTMLRow(tab.actions, e.target.parentNode.parentNode);
+                tab.activeClose = false;
+            } else {
+                makeToast("failure", "Error adding to inventory", 1000);
+            }
+        }
+    };
+};
+
+
+
 
 const removeShow = (e) => {
     let currentRow = e.target.parentNode.parentNode;
@@ -849,6 +907,10 @@ let showsActions = {
         "func": showCategories,
         "desc": "Show Categories"
     },
+    "rule_folder": {
+        "func": toggleInventory,
+        "desc": "Toggle Availability"
+    },
     "delete": {
         "func": removeShow,
         "desc": "Remove Show"
@@ -880,3 +942,11 @@ let seasonsActions = {
         "desc": "Remove Season"
     }
 };
+
+const joinelem = (elem) => {
+    if (elem === null) {
+        return null;
+    } else {
+        return elem.join(", ");
+    }
+}

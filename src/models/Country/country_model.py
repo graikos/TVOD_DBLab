@@ -25,6 +25,19 @@ class Country:
         return countries
 
     @staticmethod
+    def get_all_countries():
+        cur = dbconn.cursor()
+        cur.execute("SELECT * FROM country")
+        res = cur.fetchall()
+        cur.close()
+
+        all_countries = []
+        for country in res:
+            all_countries.append(Country(*country))
+
+        return all_countries
+
+    @staticmethod
     def add_country(country):
         cur = dbconn.cursor()
         cur.execute("INSERT INTO country (country) VALUES (%s)", (country,))

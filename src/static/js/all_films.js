@@ -32,7 +32,7 @@ window.onload = () => {
         }
         activeAdd = true;
         let table = tables["films_table"];
-        let newrow = table.appendRow(["", "", "", "", "", "", "", "", ""]);
+        let newrow = table.appendRow(["", "", "", "", "", "", "", "", "", "No"]);
         table.editHTMLRow([undefined, "text", "text", "select", "text", "text", "text", "text", "text"], newrow, saveNewFilm, [{"options": ratings}], () => {
             newrow.remove();
             activeAdd = false;
@@ -125,10 +125,11 @@ const fetchFilms = (checkPoint, refreshTable) => {
                     }
                     resp.forEach(film => {
                         tables["films_table"].appendRow([film["film_id"], film["title"], film["description"],  
-                        film["rating"], joinelem(film["language"]), joinelem(film["original_language"]), film["release_year"]]);
+                        film["rating"], joinelem(film["language"]), joinelem(film["original_language"]), film["length"], 
+                        film["release_year"],film["special_features"], (film["in_inventory"]? "Yes":"No")]);
                     });
                 }
-                start += batch;
+                start += itemnum;
             } else {
                 makeToast("failure", "Error fetching data", 1500);
             }
@@ -140,15 +141,16 @@ const createFilmsTable = (filmsData) => {
         let nosh = document.createElement("h2");
         nosh.classList.add("no-entries-text");
         nosh.innerHTML = `No shows found`;
-        document.getElementsByClassName["main-content"][0].appendChild(nosh);
+        document.getElementsByClassName("main-content")[0].appendChild(nosh);
+        return;
     }
     let table = new TableCreator(document.getElementsByClassName("main-content")[0], ["ID", "Title", "Description",
-     "Rating", "Language", "Original Language", "Length", "Release Year", "Special Features"],
+     "Rating", "Language", "Original Language", "Length", "Release Year", "Special Features", "Available"],
      [], 0, filmsActions);
      filmsData.forEach(film => {
 
         table.addInternalRow([film["film_id"], film["title"], film["description"],  
-        film["rating"], joinelem(film["language"]), joinelem(film["original_language"]), film["length"], film["release_year"], film["special_features"]]);
+        film["rating"], joinelem(film["language"]), joinelem(film["original_language"]), film["length"], film["release_year"], film["special_features"], film["in_inventory"]? "Yes":"No"]);
      });
      table.createTable(true, fetchFilms, true);
      tables["films_table"] = table;
@@ -157,7 +159,7 @@ const createFilmsTable = (filmsData) => {
 
 const editFilm = (e) => {
     let currentRow = e.target.parentNode.parentNode;
-    tables["films_table"].editHTMLRow([undefined, "text", "text", "select", "text", "text", "text", "text", "text"], currentRow, confirmEditFilm, [
+    tables["films_table"].editHTMLRow([undefined, "text", "text", "select", "text", "text", "text", "text", "text", undefined], currentRow, confirmEditFilm, [
         {
             "options": ratings
         }
@@ -211,6 +213,57 @@ const confirmEditFilm = (e, values) => {
         }
     };
 };
+
+const toggleInventory = (e) => {
+    let currentRow = e.target.parentNode.parentNode;
+    tables["films_table"].editHTMLRow([], currentRow, confirmToggleInventory, []);
+};
+
+const confirmToggleInventory = (e, values) => {
+    let film_id = parseInt(e.target.getAttribute("data-row-id"));
+
+    let in_inventory = (values[9] === "Yes");
+
+    let data = {
+        "type": "INVENTORY",
+        "action": "ADD_FILM",
+        "film_id": film_id
+    };
+
+    data = JSON.stringify(data);
+
+    let token = getCookie("sessid");
+    
+    let req = new XMLHttpRequest();
+    let url = hostname+editEndpoint;
+
+    url = encodeURI(url);
+    req.open("put", url);
+    req.setRequestHeader("Content-Type", "application/json");
+    req.setRequestHeader("Authorization", token);
+    req.send(data);
+
+
+    enableLoader();
+    req.onreadystatechange = () => {
+        if (req.readyState == 4) {
+            disableLoader();
+            if (req.status == 200) {
+                makeToast("success", "Successfully added to inventory", 1000);
+                let tab = tables["films_table"];
+                values[9] = in_inventory? "No": "Yes";
+                tab.replaceHTMLRow(values, e.target.parentNode.parentNode);
+                tab.replaceActionsInHTMLRow(tab.actions, e.target.parentNode.parentNode);
+                tab.activeClose = false;
+            } else {
+                makeToast("failure", "Error adding to inventory", 1000);
+            }
+        }
+    };
+};
+
+
+
 
 const removeFilm = (e) => {
     let currentRow = e.target.parentNode.parentNode;
@@ -626,6 +679,10 @@ let filmsActions = {
     "subject": {
         "func": showCategories,
         "desc": "Show Categories"
+    },
+    "rule_folder": {
+        "func": toggleInventory,
+        "desc": "Toggle Availability"
     },
     "delete": {
         "func": removeFilm,

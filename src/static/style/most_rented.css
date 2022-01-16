@@ -1,0 +1,10 @@
+
+
+.main-container {
+    display: inline-block;
+    position: relative;
+    width:80%;
+    left: 15%;
+    margin-top:15vh;
+    text-align: right;
+}

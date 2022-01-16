@@ -212,6 +212,75 @@ def all_countries():
     
     return render_template("all_countries.html", user_type=user_type)
 
+@app.route("/cities")
+def all_cities():
+    user_type = ""
+    try:
+        token = request.cookies["sessid"]
+        user = tokens[token]
+        if isinstance(user,Employee):
+            user_type = "Employee"
+        elif isinstance(user, Administrator):
+            user_type = "Administrator"
+        else:
+            raise ValueError
+
+    except (KeyError, ValueError):
+        resp = redirect("/login")
+        resp.delete_cookie("sessid")
+        return resp
+
+    
+    return render_template("all_cities.html", user_type=user_type)
+
+@app.route("/addresses")
+def all_addresses():
+    user_type = ""
+    try:
+        token = request.cookies["sessid"]
+        user = tokens[token]
+        if isinstance(user,Employee):
+            user_type = "Employee"
+        elif isinstance(user, Administrator):
+            user_type = "Administrator"
+        else:
+            raise ValueError
+
+    except (KeyError, ValueError):
+        resp = redirect("/login")
+        resp.delete_cookie("sessid")
+        return resp
+
+    
+    return render_template("all_addresses.html", user_type=user_type)
+
+@app.route("/mostrented")
+def most_rented():
+    user_type = ""
+    try:
+        token = request.cookies["sessid"]
+        user = tokens[token]
+        if isinstance(user,Employee):
+            user_type = "Employee"
+        elif isinstance(user, Administrator):
+            user_type = "Administrator"
+        else:
+            raise ValueError
+
+    except (KeyError, ValueError):
+        resp = redirect("/login")
+        resp.delete_cookie("sessid")
+        return resp
+
+    
+    return render_template("most_rented.html", user_type=user_type)
+
+
+
+
+
+
+
 
 
 @app.route("/login")

@@ -57,13 +57,13 @@ METHODS = {
         "DELETE": (Category.delete_category, ("category_id",))
     },
     "ADDRESS": {
-        "ADD": (Address.add_address, ("to_country", "to_city", "address", "district", "postal_code", "phone")),
+        "ADD": (Address.add_address, ("city_id", "address", "district", "postal_code", "phone")),
         "UPDATE": (Address.update_address, ("address_id", "address", "district", "city_id", "postal_code", "phone")),
         "DELETE": (Address.delete_address, ("address_id",))
     },
     "CITY": {
         "ADD": (City.add_city, ("to_country", "city")),
-        "UPDATE": (City.update_city, ("city_id", "city")),
+        "UPDATE": (City.update_city, ("city_id", "city", "country_id")),
         "DELETE": (City.delete_city, ("city_id",))
     },
     "COUNTRY": {

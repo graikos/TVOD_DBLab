@@ -184,14 +184,14 @@ CREATE TABLE film (
   title VARCHAR(128) NOT NULL,
   description TEXT DEFAULT NULL,
   release_year YEAR DEFAULT NULL,
-  language_id TINYINT UNSIGNED NOT NULL,
+  language_id TINYINT UNSIGNED DEFAULT NULL,
   original_language_id TINYINT UNSIGNED DEFAULT NULL,
   length SMALLINT UNSIGNED DEFAULT NULL,
   rating ENUM('G','PG','PG-13','R','NC-17') DEFAULT 'G',
   special_features SET('Trailers','Commentaries','Deleted Scenes','Behind the Scenes') DEFAULT NULL,
   PRIMARY KEY  (film_id),
-  CONSTRAINT fk_film_language FOREIGN KEY (language_id) REFERENCES language (language_id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT fk_film_language_original FOREIGN KEY (original_language_id) REFERENCES language (language_id) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT fk_film_language FOREIGN KEY (language_id) REFERENCES language (language_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT fk_film_language_original FOREIGN KEY (original_language_id) REFERENCES language (language_id) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -224,13 +224,13 @@ CREATE TABLE tv_show (
   title VARCHAR(128) NOT NULL,
   description TEXT DEFAULT NULL,
   release_year YEAR DEFAULT NULL,
-  language_id TINYINT UNSIGNED NOT NULL,
+  language_id TINYINT UNSIGNED DEFAULT NULL,
   original_language_id TINYINT UNSIGNED DEFAULT NULL,
   rating ENUM('G','PG','PG-13','R','NC-17') DEFAULT 'G',
   special_features SET('Trailers','Commentaries','Deleted Scenes','Behind the Scenes') DEFAULT NULL,
   PRIMARY KEY  (show_id),
-  CONSTRAINT fk_show_language FOREIGN KEY (language_id) REFERENCES language (language_id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT fk_show_language_original FOREIGN KEY (original_language_id) REFERENCES language (language_id) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT fk_show_language FOREIGN KEY (language_id) REFERENCES language (language_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT fk_show_language_original FOREIGN KEY (original_language_id) REFERENCES language (language_id) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE season (

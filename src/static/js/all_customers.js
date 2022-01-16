@@ -115,7 +115,8 @@ const createCustomersTable = (custData) => {
         let nocust = document.createElement("h2");
         nocust.classList.add("no-entries-text");
         nocust.innerHTML = `No customers found`;
-        document.getElementsByClassName["main-content"][0].appendChild(nocust);
+        document.getElementsByClassName("main-content")[0].appendChild(nocust);
+        return;
     }
     let table = new TableCreator(document.getElementsByClassName("main-content")[0], ["E-mail", "First Name", "Last Name", 
      "Subscription", "Phone", "Address", "District", "Postal Code", "Country", "City"], [], 0, customerActions);
