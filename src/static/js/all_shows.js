@@ -252,14 +252,14 @@ const confirmToggleInventory = (e, values) => {
         if (req.readyState == 4) {
             disableLoader();
             if (req.status == 200) {
-                makeToast("success", "Successfully added to inventory", 1000);
+                makeToast("success", `Successfully ${(in_inventory)? "removed from": "added to"} inventory`, 1000);
                 let tab = tables["shows_table"];
                 values[7] = in_inventory? "No": "Yes";
                 tab.replaceHTMLRow(values, e.target.parentNode.parentNode);
                 tab.replaceActionsInHTMLRow(tab.actions, e.target.parentNode.parentNode);
                 tab.activeClose = false;
             } else {
-                makeToast("failure", "Error adding to inventory", 1000);
+                makeToast("success", `Error ${(in_inventory)? "removing from": "adding to"} inventory`, 1000);
             }
         }
     };

@@ -1,5 +1,36 @@
 DELIMITER $
 
+-- Triggers for preventing INSERT on Customer/Employee/Administrator with email that exists in either other table
+DROP TRIGGER IF EXISTS customer_email$
+CREATE TRIGGER customer_email
+BEFORE INSERT ON customer
+FOR EACH ROW
+BEGIN
+    IF (NEW.email in (SELECT email FROM employee) OR NEW.email in (SELECT email FROM administrator)) THEN
+        SET NEW.email = NULL;
+    END IF;
+END$
+
+DROP TRIGGER IF EXISTS employee_email$
+CREATE TRIGGER employee_email
+BEFORE INSERT ON employee
+FOR EACH ROW
+BEGIN
+    IF (NEW.email in (SELECT email FROM customer) OR NEW.email in (SELECT email FROM administrator)) THEN
+        SET NEW.email = NULL;
+    END IF;
+END$
+
+DROP TRIGGER IF EXISTS administrator_email$
+CREATE TRIGGER administrator_email
+BEFORE INSERT ON administrator
+FOR EACH ROW
+BEGIN
+    IF (NEW.email in (SELECT email FROM customer) OR NEW.email in (SELECT email FROM employee)) THEN
+        SET NEW.email = NULL;
+    END IF;
+END$
+
 -- Trigger for preventing renting the same film/episode on the same day
 DROP TRIGGER IF EXISTS prevent_rental$
 CREATE TRIGGER prevent_rental

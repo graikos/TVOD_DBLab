@@ -82,6 +82,19 @@ class Address:
 
         return res
 
+    @staticmethod
+    def get_city_id_by_country_and_city(country, city):
+        cursor = dbconn.cursor()
+        cursor.execute("SELECT city_id FROM city INNER JOIN country ON city.country_id=country.country_id WHERE country=%s AND city=%s", (country, city))
+        res = cursor.fetchall()
+        cursor.close()
+
+        if not res:
+            raise ValueError
+
+        return res[0][0]
+
+
     # adds address and returns address ID
     @staticmethod
     def add_address(city_id, new_address, new_district, new_postal_code, new_phone):

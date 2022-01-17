@@ -4,7 +4,7 @@ from storage import tokens
 from src.models.Film import Film
 from src.models.Show import Show
 from src.models.Season import Season
-from src.models.User import Customer, Employee, Administrator
+from src.models.User import Customer, Employee, Administrator, User
 from src.models.Actor import Actor
 from src.models.Language import Language
 from src.models.Category import Category
@@ -12,12 +12,14 @@ from src.models.Address import Address
 from src.models.Country import Country
 from src.models.City import City
 from src.models.Inventory import Inventory
+from src.models.Log import Log
+from src.models.Subscription import Subscription
 
 METHODS = {
     "FILMS": (Film.get_available_films, ("start", "end")),
     "SHOWS": (Show.get_available_shows, ("start", "end")),
     "CUSTOMERS": (Customer.get_users, ("start", "end")),
-    "EMPLOYEES": (Employee.get_users, ("start", "end")),
+    "STAFF": (User.get_staff, ("start", "end")),
     "ACTORS": (Actor.get_actors, ("start", "end")),
     "LANGUAGES": (Language.get_languages, ("start", "end")),
     "CATEGORIES": (Category.get_categories, ("start", "end")),
@@ -33,13 +35,14 @@ METHODS = {
     "CATEGORIES_BY_SHOW_ID": (Category.get_category_by_show_id, ("show_id",)),
     "SEASONS_BY_SHOW_ID": (Season.get_show_seasons_by_id, ("show_id",)),
     "ALL_COUNTRIES": (Country.get_all_countries, ()),
-    "ALL_CITIES": (City.get_all_cities, ())
+    "ALL_CITIES": (City.get_all_cities, ()),
+    "LOGS": (Log.get_logs, ("start", "end"))
 }
 
 ALLOWED_METHODS = {
     Customer: {"FILMS", "SHOWS"},
     Employee: {"CUSTOMERS", "ACTORS", "LANGUAGES", "CATEGORIES", "ADDRESSES", "COUNTRIES", "CITIES", "INVENTORY", "ALL_FILMS", "ALL_SHOWS", "ACTORS_BY_FILM_ID", "ACTORS_BY_SHOW_ID", "CATEGORIES_BY_FILM_ID", "CATEGORIES_BY_SHOW_ID", "SEASONS_BY_SHOW_ID", "ALL_COUNTRIES", "ALL_CITIES"},
-    Administrator: {"EMPLOYEES"}
+    Administrator: {"STAFF", "LOGS"}
 }
 
 ALLOWED_METHODS[Employee] |= ALLOWED_METHODS[Customer]
@@ -70,7 +73,7 @@ class Fetch(Resource):
                 raise ValueError
 
         res = METHODS[request.args.get("type")][0](*(int(request.args.get(x)) for x in METHODS[request.args.get("type")][1]))
-        res_json = [r.to_dict() for r in res]
+        res_json = [r.to_dict() for r in res if request.args.get("type") != "STAFF" or r.email != user.email]
 
         return make_response(jsonify(res_json), 200)
         

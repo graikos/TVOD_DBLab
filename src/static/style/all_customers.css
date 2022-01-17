@@ -21,3 +21,29 @@
     overflow-x: hidden;
     white-space: auto;
 }
+
+
+.new-pass-input {
+    width: 50%;
+    position: relative;
+    left: 22%;
+    opacity: 0;
+    animation: inputenter .25s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes inputenter {
+    from {
+        opacity: 0;
+        left: 22%;
+    } to {
+        opacity: 1;
+        left: 25%;
+    }
+}
+.submit-pass {
+    position: relative;
+    left: 0;
+    margin-left: -100px;
+    margin-top: 40px;
+}

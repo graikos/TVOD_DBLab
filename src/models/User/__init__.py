@@ -1,1 +1,1 @@
-from .user_model import Customer, Employee, Administrator
+from .user_model import User, Customer, Employee, Administrator

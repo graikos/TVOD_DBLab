@@ -9,14 +9,6 @@ class Subscription(Resource):
     def get(self):
         sub_data = subscription_model.Subscription.get_all()
 
-        sub_dict = {}
-
-        for sub in sub_data:
-            sub_dict[sub[0]] = {
-                "film_cost": sub[1],
-                "episode_cost": sub[2]
-            }
-
         return make_response(jsonify(sub_data), 200)
 
     def post(self):

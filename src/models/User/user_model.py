@@ -25,6 +25,7 @@ class User(abc.ABC):
         self.active = None
         self.create_date = None
         self.sub_type = None
+        self.is_admin = False
 
     def get_user_data_by_email(self, email):
         cur = dbconn.cursor()
@@ -74,7 +75,8 @@ class User(abc.ABC):
             "address": self.address,
             "district": self.district,
             "postal_code": self.postal_code,
-            "phone": self.phone
+            "phone": self.phone,
+            "is_admin": self.is_admin
         }
 
     @staticmethod
@@ -116,9 +118,9 @@ class User(abc.ABC):
         return res[:4] + address_data + res[5:]
 
     @staticmethod
-    def get_users(table, start, end):
+    def get_users(table, start, end, extra_column = None):
         cur = dbconn.cursor()
-        cur.execute(f"SELECT email,first_name,last_name,create_date,subscription_type,address_id FROM {table} LIMIT %s,%s", (start, end))
+        cur.execute("SELECT email,first_name,last_name,create_date,{}address_id FROM {} LIMIT %s,%s".format(extra_column + "," if extra_column else "", table), (start, end))
         res = cur.fetchall()
 
         users = []
@@ -129,8 +131,13 @@ class User(abc.ABC):
             new_user.first_name = user[1]
             new_user.last_name = user[2]
             new_user.create_date = user[3]
-            new_user.sub_type = user[4]
-            new_user.get_address_data_by_id(user[5])
+            if extra_column:
+                new_user.sub_type = user[4]
+                new_user.get_address_data_by_id(user[5])
+            else:
+                new_user.get_address_data_by_id(user[4])
+            if table == Administrator.TABLE:
+                new_user.is_admin = True
             users.append(new_user)
 
         cur.close()
@@ -140,10 +147,10 @@ class User(abc.ABC):
     @staticmethod
     def create_user(table, first_name, last_name, email, address_id, password):
         salt = "".join(choice(ALLCHARS) for _ in range(8))
-        pass_hash = sha256(password + salt).hexdigest()
+        pass_hash = sha256((password + salt).encode()).hexdigest()
 
         cur = dbconn.cursor()
-        cur.execute(f"INSERT INTO {table}(first_name,last_name,email,address_id,pass_hash,pass_salt) VALUES (%s,%s,%s,%s,%s,%s)", (first_name, last_name, email, address_id, pass_hash, salt))
+        cur.execute(f"INSERT INTO {table}(first_name,last_name,email,address_id,create_date,pass_hash,pass_salt) VALUES (%s,%s,%s,%s,NOW(),%s,%s)", (first_name, last_name, email, address_id, pass_hash, salt))
         dbconn.commit()
         cur.close()
 
@@ -163,12 +170,21 @@ class User(abc.ABC):
             raise ValueError
 
         # save data but remove unique ID
-        data = res[0][0][1:]
+        data = res[0][1:]
 
         cur.execute(f"DELETE FROM {from_table} WHERE email=%s", (email,))
         cur.execute(f"INSERT INTO {to_table} (first_name, last_name, email, address_id, active, create_date, pass_hash, pass_salt) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (*data,))
         dbconn.commit()
         cur.close()
+
+    @staticmethod
+    def get_staff(start, end):
+        staff = Administrator.get_users(start, end)
+        
+        if len(staff) < end:
+            staff.extend(Employee.get_users(start, end - len(staff)))
+
+        return staff        
 
 
 class Customer(User):
@@ -190,11 +206,17 @@ class Customer(User):
 
     @staticmethod
     def get_users(start, end):
-        return User.get_users(Customer.TABLE, start, end)
+        return User.get_users(Customer.TABLE, start, end, extra_column = "subscription_type")
 
     @staticmethod
-    def create_user(first_name, last_name, email, address_id, password):
-        return User.create_user(Customer.TABLE, first_name, last_name, email, address_id, password)
+    def create_user(first_name, last_name, email, address_id, sub_type, password):
+        salt = "".join(choice(ALLCHARS) for _ in range(8))
+        pass_hash = sha256((password + salt).encode()).hexdigest()
+
+        cur = dbconn.cursor()
+        cur.execute(f"INSERT INTO {Customer.TABLE}(first_name,last_name,email,address_id,create_date,subscription_type,pass_hash,pass_salt) VALUES (%s,%s,%s,%s,NOW(),%s,%s,%s)", (first_name, last_name, email, address_id, sub_type, pass_hash, salt))
+        dbconn.commit()
+        cur.close()
 
     @staticmethod
     def delete_user(email):

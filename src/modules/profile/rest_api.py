@@ -15,7 +15,7 @@ class Profile(Resource):
     def get(self):
         try:
             user = tokens[request.headers["authorization"]]
-            if not (isinstance(user, Employee) or isinstance(user, Administrator)) and user.email != request.args.get("for_user"):
+            if isinstance(user, Customer) and user.email != request.args.get("for_user"):
                 raise ValueError
 
             requested_data = User.find_user_data(request.args.get("for_user"))
@@ -46,12 +46,15 @@ class Profile(Resource):
             if isinstance(user, Customer) and user.email != data["for_user"]:
                 raise ValueError
 
-            if "change_to" in data:
+            if "toggle" in data:
                 if not isinstance(user, Administrator):
                     raise ValueError
 
                 user_table = User.find_user_table(data["for_user"])
-                if user_table not in {"administrator", "employee"}:
+                if user_table == "customer":
+                    raise ValueError
+
+                if user.email == data["for_user"]:
                     raise ValueError
 
                 USER_TYPES[user_table].toggle_rank(data["for_user"])
@@ -63,20 +66,31 @@ class Profile(Resource):
                 new_customer = Customer()
                 try:
                     new_customer.get_user_data_by_email(data["for_user"])
+
                 except ValueError:
                     if not isinstance(user, Administrator):
                         raise ValueError
 
-                    address_id = Address.add_address(data["country"], data["city"], data["address"], data["district"], data["postal_code"], data["phone"])
+                    city_id = Address.get_city_id_by_country_and_city(data["country"], data["city"])
+                    address_id = Address.add_address(city_id, data["address"], data["district"], data["postal_code"], data["phone"])
 
-                    USER_TYPES[data["type"]].create_user(data["first_name"], data["last_name"], data["email"], address_id, data["password"])
+                    if data["type"] == "customer":
+                        args = data["first_name"], data["last_name"], data["for_user"], address_id, data["sub_type"], data["password"]
+                    elif data["type"] == "employee":
+                        args = data["first_name"], data["last_name"], data["for_user"], address_id, data["password"]
+                    else:
+                        raise ValueError
+
+                    USER_TYPES[data["type"]].create_user(*args)
                     return make_response(jsonify(""), 201)
+
+            city_id = Address.get_city_id_by_country_and_city(data["country"], data["city"])
 
 
         except (KeyError, ValueError, AttributeError):
             return make_response(jsonify(""), 403)
 
-        address_id = Address.add_address(data["country"], data["city"], data["address"], data["district"], data["postal_code"], data["phone"])
+        address_id = Address.add_address(city_id, data["address"], data["district"], data["postal_code"], data["phone"])
 
         new_customer.update_data(data["first_name"], data["last_name"],
         address_id, data["sub_type"].upper())
@@ -92,6 +106,9 @@ class Profile(Resource):
 
             data = json.loads(request.data)
             user_table = User.find_user_table(data["for_user"])
+
+            if user_table == "administrator":
+                raise ValueError
             
             USER_TYPES[user_table].delete_user(data["for_user"])
             return make_response(jsonify(""), 200)

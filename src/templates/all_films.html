@@ -13,8 +13,11 @@
         </div>
         <div class="side-navbar">
             <a class="tab-btn" id="all-customers-tab" href="/customers">Customers</a>
+            {% if user_type == "Administrator" %}
+            <a class="tab-btn" id="all-staff-tab" href="/staff">Staff</a>
+            {% endif %}
             <a class="tab-btn" id="all-shows-tab" href="/shows">Shows</a>
-            <a class="tab-btn tab-btn-active" id="all-filmls-tab" href="/films">Films</a>
+            <a class="tab-btn tab-btn-active" id="all-films-tab" href="/films">Films</a>
             <a class="tab-btn" id="all-actors-tab" href="/actors">Actors</a>
             <a class="tab-btn" id="all-categories-tab" href="/categories">Categories</a>
             <a class="tab-btn" id="all-languages-tab" href="/languages">Languages</a>
@@ -22,8 +25,9 @@
             <a class="tab-btn" id="all-cities-tab" href="/cities">Cities</a>
             <a class="tab-btn" id="all-addresses-tab" href="/addresses">Addresses</a>
             <a class="tab-btn" id="most-rented-tab" href="/mostrented">Most Rented</a>
-            {% if user_type == "Employee" %}
-            {% elif sub_type == "Administrator" %}
+            {% if user_type == "Administrator" %}
+            <a class="tab-btn" id="all-income-tab" href="/income">Income</a>
+            <a class="tab-btn" id="prices-tab" href="/prices">Prices</a>
             {% endif %}
             <a class="tab-btn" id="log-out">Log out</a>
         </div>

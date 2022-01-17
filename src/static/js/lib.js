@@ -107,7 +107,11 @@ const createSelector = (host_elem, options, default_idx, default_text, selectAct
 
     host_elem.append(select);
     let sel = new Selector(select, options, default_idx, selectAction);
-    sel.setText(default_text);
+    if (default_text.length === 0) {
+        sel.element.getElementsByClassName("selected-option-text")[0].innerHTML = `<span>&nbsp;</span>`;
+    } else {
+        sel.setText(default_text);
+    }
     return sel;
 }
 
@@ -438,7 +442,7 @@ class TableCreator {
 
 
 
-createPopUp = (host_elem, ptitle, objToClear, keyToClear, for_id) => {
+createPopUp = (host_elem, ptitle, objToClear, keyToClear, for_id, capture, onClose) => {
     let popup = document.createElement("div");
     popup.classList.add("popup");
     popup.setAttribute("data-for-id", for_id);
@@ -453,13 +457,27 @@ createPopUp = (host_elem, ptitle, objToClear, keyToClear, for_id) => {
     let title = document.createElement("h1")
     title.innerHTML = `${ptitle}`;
     popup.appendChild(title);
-    host_elem.insertBefore(popup, host_elem.firstChild);
+    host_elem.insertBefore(popup, host_elem.firstChild, capture, onClose);
     return popup;
 };
 
-closePopUp = (p, objToClear, keyToClear) => {
+closePopUp = (p, objToClear, keyToClear, capture, onClose) => {
+    /*
+    {
+        id,
+        value (to be returned)
+    }
+    */
+    if (capture !== undefined) {
+        for (let item in capture) {
+            let elem = document.getElementById(item);
+            capture[item].value = elem.value;
+        }
+    }
     p.target.parentNode.remove();
-    delete objToClear[keyToClear];
+    if (objToClear !== undefined) {
+        delete objToClear[keyToClear];
+    }
 };
 
 addFloatingButton = (host_elem, type, action, source) => {

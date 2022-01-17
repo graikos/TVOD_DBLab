@@ -1,4 +1,4 @@
-from flask import redirect, render_template, request
+from flask import redirect, render_template, request, redirect
 from src import app
 from src.modules import API
 from src.models.User import Customer, Employee, Administrator
@@ -23,13 +23,19 @@ def main():
     try:
         token = request.cookies["sessid"]
         user = tokens[token]
+        if isinstance(user,Employee) or isinstance(user, Administrator):
+            return redirect("/customers")
+        elif isinstance(user, Customer):
+            pass
+        else:
+            raise ValueError
 
     except KeyError:
         resp = redirect("/login")
         resp.delete_cookie("sessid")
         return resp
 
-    return render_template(user_type_to_page["main"][type(user)], sub_type=request.cookies["sub_type"])
+    return render_template("main_customer.html", sub_type=request.cookies["sub_type"])
 
 @app.route("/myaccount")
 def my_account():
@@ -82,7 +88,6 @@ def all_customers():
         resp.delete_cookie("sessid")
         return resp
 
-    
     return render_template("all_customers.html", user_type=user_type)
 
 @app.route("/shows")
@@ -275,6 +280,64 @@ def most_rented():
     
     return render_template("most_rented.html", user_type=user_type)
 
+
+@app.route("/staff")
+def all_accounts():
+    user_type = ""
+    try:
+        token = request.cookies["sessid"]
+        user = tokens[token]
+        if isinstance(user, Administrator):
+            user_type = "Administrator"
+        else:
+            raise ValueError
+
+    except (KeyError, ValueError):
+        resp = redirect("/login")
+        resp.delete_cookie("sessid")
+        return resp
+
+    
+    return render_template("all_accounts.html", user_type=user_type)
+
+
+@app.route("/income")
+def all_income():
+    user_type = ""
+    try:
+        token = request.cookies["sessid"]
+        user = tokens[token]
+        if isinstance(user, Administrator):
+            user_type = "Administrator"
+        else:
+            raise ValueError
+
+    except (KeyError, ValueError):
+        resp = redirect("/login")
+        resp.delete_cookie("sessid")
+        return resp
+
+    
+    return render_template("all_income.html", user_type=user_type)
+
+@app.route("/prices")
+def prices():
+    user_type = ""
+    try:
+        token = request.cookies["sessid"]
+        user = tokens[token]
+        if isinstance(user, Administrator):
+            user_type = "Administrator"
+        else:
+            raise ValueError
+
+    except (KeyError, ValueError):
+        resp = redirect("/login")
+        resp.delete_cookie("sessid")
+        return resp
+
+    
+    return render_template("prices.html", user_type=user_type)
 
 
 

@@ -11,13 +11,13 @@ class Rental(Resource):
         try:
             user = tokens[request.headers["authorization"]]
             if "for_user" in request.args:
-                if not isinstance(user, Employee) and user.email != request.args.get("for_user"):
+                if isinstance(user, Customer) and user.email != request.args.get("for_user"):
                     raise ValueError
 
                 requested_data = rental_model.Rental.get_rentals_for_customer(request.args.get("for_user"))
 
             elif "most_rented" in request.args:
-                if not isinstance(user, Employee) or request.args["most_rented"] not in {"m", "s"}:
+                if isinstance(user, Customer) or request.args["most_rented"] not in {"m", "s"}:
                     raise ValueError
 
                 requested_data = rental_model.Rental.get_most_rented(request.args.get("most_rented"))

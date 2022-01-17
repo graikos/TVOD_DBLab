@@ -282,6 +282,8 @@ body {
     width:80%;
     top:12vh;
     left:10%;
+    font-size: 22px;
+    line-height: 45px;
 }
 
 .select {
