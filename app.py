@@ -3,6 +3,12 @@ from src import app
 from src.modules import API
 from src.models.User import Customer, Employee, Administrator
 from storage import tokens
+from PyQt5.QtCore import QUrl, Qt
+from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineProfile
+import threading
+import sys
+
 
 API.init_app(app)
 
@@ -339,17 +345,47 @@ def prices():
     
     return render_template("prices.html", user_type=user_type)
 
+@app.route("/logs")
+def logs():
+    user_type = ""
+    try:
+        token = request.cookies["sessid"]
+        user = tokens[token]
+        if isinstance(user, Administrator):
+            user_type = "Administrator"
+        else:
+            raise ValueError
 
+    except (KeyError, ValueError):
+        resp = redirect("/login")
+        resp.delete_cookie("sessid")
+        return resp
 
-
-
-
-
+    
+    return render_template("logs.html", user_type=user_type)
 
 @app.route("/login")
 def login():
     return render_template("login.html")
 
+def runServer():
+    app.run(host="localhost", port=5000)
+
 
 if __name__ == "__main__":
-    app.run(host="localhost", port=5000)
+    serv = threading.Thread(target=runServer)
+    serv.setDaemon(True)
+    serv.start()
+    qapp = QApplication(sys.argv)
+    qapp.setApplicationDisplayName("TVOnDemand")
+    web = QWebEngineView()
+    web.page().profile().setHttpCacheType(QWebEngineProfile.HttpCacheType.NoCache)
+    web.load(QUrl("http://localhost:5000"))
+    window = QMainWindow()
+    window.setFixedSize(1860, 933.75)
+    window.setCentralWidget(web)
+    window.show()
+    
+
+    sys.exit(qapp.exec_())
+

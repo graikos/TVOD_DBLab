@@ -19,6 +19,15 @@
     font-weight: 400;
     src: url("../fonts/MaterialIcons-Regular.ttf");
   }
+
+
+body {
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+ }
 .material-icons {
     font-family: 'Material Icons';
     font-weight: normal;
@@ -195,7 +204,7 @@ body {
     display: inline-block;
     background-color:#AD1457;
     border-radius: 50%;
-    animation: leftloadermove 1s infinite;
+    animation: leftloadermove .5s infinite;
 }
 
 .loader::after {
@@ -208,7 +217,7 @@ body {
     display: inline-block;
     background-color:#6e0f38;
     border-radius: 50%;
-    animation: rightloadermove 1s infinite;
+    animation: rightloadermove .5s infinite;
 }
 
 @keyframes leftloadermove {

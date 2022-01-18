@@ -54,33 +54,6 @@ BEGIN
     END IF;
 END$
 
-/*
-
-DROP PROCEDURE IF EXISTS mark_log_successful$
-CREATE PROCEDURE mark_log_successful(IN size INT)
-BEGIN
-    DECLARE iter INT;
-    DECLARE done BOOLEAN;
-    DECLARE lid INT UNSIGNED;
-    DECLARE logid_cursor CURSOR FOR SELECT log_id FROM temp_log_ids ORDER BY tmp_id DESC;
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done=TRUE;
-    SET iter = 0;
-    SET done = FALSE;
-
-    OPEN logid_cursor;
-    REPEAT
-        FETCH logid_cursor INTO lid;
-        IF (done = FALSE) THEN
-            UPDATE logger SET success = TRUE WHERE log_id=lid;
-        END IF;
-        SET iter = iter + 1;
-    UNTIL (done=TRUE OR iter=size)
-    END REPEAT;
-
-    CLOSE logid_cursor;
-    DELETE FROM temp_log_ids;
-END$
-*/
 
 DROP PROCEDURE IF EXISTS mark_log_successful$
 CREATE PROCEDURE mark_log_successful()
