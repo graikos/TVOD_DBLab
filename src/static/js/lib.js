@@ -506,9 +506,7 @@ showLoadMore = () => {
 }
 
 replaceNA = (val) => {
-    console.log(val);
     if (val === "NA") {
-        console.log('returning null');
         return null;
     } else {
         return val

@@ -180,7 +180,7 @@ class User(abc.ABC):
     @staticmethod
     def get_staff(start, end):
         staff = Administrator.get_users(start, end)
-        
+
         if len(staff) < end:
             staff.extend(Employee.get_users(start, end - len(staff)))
 

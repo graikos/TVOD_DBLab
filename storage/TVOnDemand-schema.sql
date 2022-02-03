@@ -332,3 +332,9 @@ CREATE TABLE payment (
 CREATE FULLTEXT INDEX actor_index
 ON actor (last_name);
 
+CREATE FULLTEXT INDEX customer_email_index
+ON customer (email);
+CREATE FULLTEXT INDEX employee_email_index
+ON employee (email);
+CREATE FULLTEXT INDEX admin_email_index
+ON administrator (email);

@@ -5,7 +5,7 @@ from src.models.User import Customer, Employee, Administrator
 from storage import tokens
 from PyQt5.QtCore import QUrl, Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow
-from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineProfile
+from PyQt5.QtWebEngineWidgets import QWebEngineView
 import threading
 import sys
 
@@ -379,10 +379,9 @@ if __name__ == "__main__":
     qapp = QApplication(sys.argv)
     qapp.setApplicationDisplayName("TVOnDemand")
     web = QWebEngineView()
-    web.page().profile().setHttpCacheType(QWebEngineProfile.HttpCacheType.NoCache)
     web.load(QUrl("http://localhost:5000"))
     window = QMainWindow()
-    window.setFixedSize(1860, 933.75)
+    window.setFixedSize(1860, 934)
     window.setCentralWidget(web)
     window.show()
     
