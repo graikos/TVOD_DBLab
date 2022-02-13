@@ -114,3 +114,7 @@
     display: inline-block;
     vertical-align: middle;
 }
+
+.side-navbar {
+    width: 20%;
+}
