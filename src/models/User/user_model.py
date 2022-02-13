@@ -186,7 +186,7 @@ class User(abc.ABC):
         staff = staff[start:]
         
         if len(staff) < end:
-            staff.extend(Employee.get_users(start - factor + 1 if start - factor + 1 >= 0 else 0, end - len(staff)))
+            staff.extend(Employee.get_users(start - factor if start - factor >= 0 else 0, end - len(staff)))
 
         return staff        
 

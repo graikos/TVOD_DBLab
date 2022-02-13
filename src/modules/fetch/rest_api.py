@@ -75,26 +75,6 @@ class Fetch(Resource):
         res = METHODS[request.args.get("type")][0](*(int(request.args.get(x)) for x in METHODS[request.args.get("type")][1]))
         res_json = [r.to_dict() for r in res]
 
-        if request.args.get("type") == "STAFF":
-            
-            found = False
-            r = None
-
-            for r in res:
-                print(user.email)
-                if user.email in r.email:
-                    found = True
-                    print(request.args)
-                    new_user = User.get_staff(int(request.args.get("start")) + int(request.args.get("end")) - 2, 1)
-                    if not new_user:
-                        break
-                    res_json.append(new_user[0].to_dict())
-                    break
-
-            if found:
-                res_json.remove(r.to_dict())
-
-
         return make_response(jsonify(res_json), 200)
         
 
