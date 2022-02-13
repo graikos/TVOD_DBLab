@@ -122,7 +122,7 @@ class User(abc.ABC):
         cur = dbconn.cursor()
         cur.execute("SELECT email,first_name,last_name,create_date,{}address_id FROM {} LIMIT %s,%s".format(extra_column + "," if extra_column else "", table), (start, end))
         res = cur.fetchall()
-
+        
         users = []
 
         for user in res:
@@ -179,10 +179,14 @@ class User(abc.ABC):
 
     @staticmethod
     def get_staff(start, end):
-        staff = Administrator.get_users(start, end)
+        staff = Administrator.get_users(0, end)
 
+        factor = len(staff)
+
+        staff = staff[start:]
+        
         if len(staff) < end:
-            staff.extend(Employee.get_users(start, end - len(staff)))
+            staff.extend(Employee.get_users(start - factor + 1 if start - factor + 1 >= 0 else 0, end - len(staff)))
 
         return staff        
 
