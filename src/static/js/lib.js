@@ -262,7 +262,9 @@ class TableCreator {
             btn.innerHTML = `Load More`;
             btn.id = "load-more-btn";
             btn.classList.add("load-more");
-            btn.addEventListener("click", loadMore);
+            btn.addEventListener("click", () => {
+                loadMore();
+            });
             this.host_elem.appendChild(btn);
         }
     }

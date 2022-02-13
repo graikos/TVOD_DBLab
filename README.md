@@ -8,3 +8,5 @@ python3 app.py
 ```
 
 The MySQL database files are included in the storage directory.
+
+Database credentials can be configured (config/params.json).
