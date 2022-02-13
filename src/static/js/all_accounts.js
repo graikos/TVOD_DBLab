@@ -191,7 +191,11 @@ const fetchStaff = (checkPoint, refreshTable) => {
             disableLoader();
             if (req.status == 200) {
                 resp = JSON.parse(req.response);
+                if (resp.length < batch) {
+                    document.getElementById("load-more-btn").remove();
+                }
                 haveLoaded += resp.length;
+                resp = resp.filter((el) => el["email"] !== getCookie("email"));
                 if (tables["staff_table"] === undefined || refreshTable) {
                     if (refreshTable) {
                         haveLoaded = resp.length+1;
@@ -203,9 +207,6 @@ const fetchStaff = (checkPoint, refreshTable) => {
                         cust["phone"], cust["address"], cust["district"] ,cust["postal_code"], 
                         cust["country"], cust["city"], (cust["is_admin"]? "Yes" : "No")]);
                     });
-                }
-                if (resp.length < batch) {
-                    document.getElementById("load-more-btn").remove();
                 }
                 if (globalAddressData === undefined) {
                     fetchAddressData();
